@@ -238,13 +238,34 @@ const getGenderAndAgeStats = (callback) => {
       COUNT(*) AS count
     FROM HM_MEMBER
     WHERE deldt IS NULL AND mem_sex IS NOT NULL  -- 성별 데이터가 있는 경우만 집계
-    GROUP BY mem_sex, age_group
-    ORDER BY mem_sex, age_group;
+    GROUP BY age_group, mem_sex
+    ORDER BY age_group, mem_sex;
   `;
 
   connection.query(query, (error, results) => {
     if (error) return callback(error);
-    callback(null, results);
+
+    // 데이터를 연령대별로 묶어서 새로운 형식으로 변환
+    const groupedData = results.reduce((acc, row) => {
+      const { age_group, mem_sex, count } = row;
+      
+      if (!acc[age_group]) {
+        acc[age_group] = { age_group, male: 0, female: 0 };
+      }
+
+      if (mem_sex === 'Y') {
+        acc[age_group].male = count;
+      } else if (mem_sex === 'N') {
+        acc[age_group].female = count;
+      }
+
+      return acc;
+    }, {});
+
+    // 객체 형태를 배열로 변환
+    const data = Object.values(groupedData);
+
+    callback(null, data);
   });
 };
 
