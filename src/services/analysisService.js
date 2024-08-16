@@ -28,11 +28,12 @@ const getVisitors = (type, callback) => {
 
         const todayVisitors = Number(todayResults[0].daily_visitors);
 
+        const today = new Date().toISOString().split('T')[0];
+        results.unshift({ period: today, total_visitors: todayVisitors });
+
         const data = results.map((row, index) => {
           let date = new Date(row.period);
-          if (index === 0) {
-            row.total_visitors = (row.total_visitors || 0) + todayVisitors; // null을 0으로 대체하여 합산
-          } else {
+          if (index > 0) {
             date.setDate(date.getDate() + 1);
           }
           const formattedDate = date.toISOString().split('T')[0];
@@ -48,12 +49,12 @@ const getVisitors = (type, callback) => {
     query = `
       SELECT 
         DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL (7 * seq) DAY), '%Y-%m-%d') AS period,
-        COALESCE((
-          SELECT SUM(vcnt)
+        (
+          SELECT IFNULL(SUM(vcnt), 0)
           FROM hdumduStat.STAT_DATE_VISIT
           WHERE dt >= DATE_SUB(CURDATE(), INTERVAL (7 * seq + 6) DAY)
           AND dt <= DATE_SUB(CURDATE(), INTERVAL (7 * seq) DAY)
-        ), 0) AS total_visitors
+        ) AS total_visitors
       FROM 
       (
         SELECT 0 AS seq UNION ALL
@@ -68,11 +69,7 @@ const getVisitors = (type, callback) => {
     query = `
       SELECT 
         DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL seq MONTH), '%Y-%m') AS period,
-        COALESCE((
-          SELECT SUM(vcnt)
-          FROM hdumduStat.STAT_DATE_VISIT
-          WHERE DATE_FORMAT(dt, '%Y-%m') = DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL seq MONTH), '%Y-%m')
-        ), 0) AS total_visitors
+        COALESCE(SUM(v.vcnt), 0) AS total_visitors
       FROM 
       (
         SELECT 0 AS seq UNION ALL
@@ -81,6 +78,10 @@ const getVisitors = (type, callback) => {
         SELECT 3 UNION ALL
         SELECT 4
       ) AS months
+      LEFT JOIN hdumduStat.STAT_DATE_VISIT v
+      ON v.dt >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL seq MONTH), '%Y-%m-01')
+      AND v.dt < DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL (seq - 1) MONTH), '%Y-%m-01')
+      GROUP BY period
       ORDER BY period DESC;
     `;
   } else {
@@ -90,20 +91,23 @@ const getVisitors = (type, callback) => {
   connection.query(query, (error, results) => {
     if (error) return callback(error);
 
-    // 오늘의 방문자 수 쿼리 실행
+    // 두 번째 쿼리 실행 (오늘 날짜의 방문자 수)
     connection.query(todayVisitorsQuery, (error, todayResults) => {
       if (error) return callback(error);
 
-      const todayVisitors = Number(todayResults[0].daily_visitors);
+      const todayVisitors = todayResults[0].daily_visitors;
 
-      // 첫 번째 인덱스에 오늘 방문자 수를 더해서 반환
+      // 날짜에 1일을 추가하고, week/month의 경우 합산
       const data = results.map((row, index) => {
         const date = new Date(row.period);
+
+        // 첫 번째 인덱스에 오늘 방문자 수를 합산 (숫자 덧셈 보장)
         if (index === 0) {
-          row.total_visitors = (row.total_visitors || 0) + todayVisitors; // null을 0으로 대체하여 합산
+          row.total_visitors = Number(row.total_visitors) + Number(todayVisitors);
         }
+
         const formattedDate = date.toISOString().split('T')[0];
-        return { [formattedDate]: row.total_visitors };
+        return { [formattedDate]: Number(row.total_visitors) }; // 숫자로 변환하여 반환
       });
 
       const response = { data };
