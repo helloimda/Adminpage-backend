@@ -119,18 +119,89 @@ const getVisitors = (type, callback) => {
 
 
 
-const getTodayRegistrations = (callback) => {
-  const query = `
-    SELECT COUNT(*) AS today_registrations
-    FROM HM_MEMBER
-    WHERE DATE(regdt) = CURDATE();
-  `;
+const getRegistrations = (type, callback) => {
+  let query = '';
+
+  if (type === 'date') {
+    query = `
+      SELECT 
+        date_series.date AS period, 
+        IFNULL(COUNT(hm.regdt), 0) AS registrations
+      FROM 
+        (
+          SELECT DATE(DATE_SUB(CURDATE(), INTERVAL seq DAY)) AS date
+          FROM (
+            SELECT 0 AS seq UNION ALL 
+            SELECT 1 UNION ALL 
+            SELECT 2 UNION ALL 
+            SELECT 3 UNION ALL 
+            SELECT 4 UNION ALL 
+            SELECT 5 UNION ALL 
+            SELECT 6
+          ) AS seq_table
+        ) AS date_series
+      LEFT JOIN hdumdu.HM_MEMBER hm ON DATE(hm.regdt) = date_series.date
+      GROUP BY date_series.date
+      ORDER BY date_series.date DESC;
+    `;
+  } else if (type === 'week') {
+    query = `
+      SELECT 
+        DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL seq WEEK), '%Y-%m-%d') AS period,
+        IFNULL(COUNT(hm.regdt), 0) AS registrations
+      FROM 
+        (
+          SELECT 0 AS seq UNION ALL 
+          SELECT 1 UNION ALL 
+          SELECT 2 UNION ALL 
+          SELECT 3 UNION ALL 
+          SELECT 4
+        ) AS seq_table
+      LEFT JOIN hdumdu.HM_MEMBER hm ON YEARWEEK(hm.regdt, 1) = YEARWEEK(DATE_SUB(CURDATE(), INTERVAL seq WEEK), 1)
+      GROUP BY period
+      ORDER BY period DESC;
+    `;
+  } else if (type === 'month') {
+    query = `
+      SELECT 
+        DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL seq MONTH), '%Y-%m') AS period,
+        IFNULL(COUNT(hm.regdt), 0) AS registrations
+      FROM 
+        (
+          SELECT 0 AS seq UNION ALL 
+          SELECT 1 UNION ALL 
+          SELECT 2 UNION ALL 
+          SELECT 3 UNION ALL 
+          SELECT 4
+        ) AS seq_table
+      LEFT JOIN hdumdu.HM_MEMBER hm ON DATE_FORMAT(hm.regdt, '%Y-%m') = DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL seq MONTH), '%Y-%m')
+      GROUP BY period
+      ORDER BY period DESC;
+    `;
+  } else {
+    return callback(new Error('유효하지 않은 타입입니다.'));
+  }
 
   connection.query(query, (error, results) => {
     if (error) return callback(error);
-    callback(null, results[0].today_registrations);
+
+    const data = results.map(row => {
+      const formattedDate = new Date(row.period);
+      if (type === 'date') {
+        formattedDate.setDate(formattedDate.getDate() + 1);
+      }
+      return { [formattedDate.toISOString().split('T')[0]]: row.registrations };
+    });
+
+    const response = { data };
+
+    callback(null, response);
   });
 };
+
+
+
+
 
 const getTotalMembers = (type, callback) => {
   const todayMembersQuery = `
@@ -272,7 +343,7 @@ const getGenderAndAgeStats = (callback) => {
 
 module.exports = {
   getVisitors,
-  getTodayRegistrations,
+  getRegistrations,
   getTotalMembers,
   getGenderAndAgeStats,  
 };
