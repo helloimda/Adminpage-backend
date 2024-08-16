@@ -1,13 +1,14 @@
 // controllers/analysisController.js
 const analysisService = require('../services/analysisService');
 
-const getDailyVisitors = (req, res) => {
-  analysisService.getDailyVisitors((error, count) => {
+const getVisitors = (req, res) => {
+  const type = req.params.type;
+
+  analysisService.getVisitors(type, (error, results) => {
     if (error) {
-      console.error('일일 방문자 수 집계 중 오류 발생:', error.message);
-      return res.status(500).send('일일 방문자 수 집계 중 오류가 발생했습니다.');
+      return res.status(500).json({ message: error.message });
     }
-    res.json({ dailyVisitors: count });
+    res.json(results);
   });
 };
 
@@ -43,7 +44,7 @@ const getGenderAndAgeStats = (req, res) => {
 };
 
 module.exports = {
-  getDailyVisitors,
+  getVisitors, 
   getTodayRegistrations,
   getTotalMembers,
   getGenderAndAgeStats,  

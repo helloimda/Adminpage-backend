@@ -4,7 +4,7 @@ const router = express.Router();
 const analysisController = require('../controllers/analysisController');
 
 // 일일 방문자 수를 가져오는 라우트
-router.get('/analysis/daily-visitors', analysisController.getDailyVisitors);
+router.get('/analysis/visitors/:type', analysisController.getVisitors);
 
 // 오늘 날짜에 가입한 사람 수를 가져오는 라우트
 router.get('/analysis/today-registrations', analysisController.getTodayRegistrations);
