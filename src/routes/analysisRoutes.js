@@ -7,7 +7,7 @@ const analysisController = require('../controllers/analysisController');
 router.get('/analysis/visitors/:type', analysisController.getVisitors);
 
 // 오늘 날짜에 가입한 사람 수를 가져오는 라우트
-router.get('/analysis/today-registrations', analysisController.getTodayRegistrations);
+router.get('/analysis/registrations/:type', analysisController.getRegistrations);
 
 // 총 회원 수를 가져오는 라우트
 router.get('/analysis/total-members/:type', analysisController.getTotalMembers);

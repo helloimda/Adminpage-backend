@@ -12,8 +12,9 @@ const getVisitors = (req, res) => {
   });
 };
 
-const getTodayRegistrations = (req, res) => {
-  analysisService.getTodayRegistrations((error, count) => {
+const getRegistrations = (req, res) => {
+  const type = req.params.type;
+  analysisService.getRegistrations(type,(error, count) => {
     if (error) {
       console.error('오늘 날짜에 가입자 수 집계 중 오류 발생:', error.message);
       return res.status(500).send('오늘 날짜에 가입자 수 집계 중 오류가 발생했습니다.');
@@ -45,7 +46,7 @@ const getGenderAndAgeStats = (req, res) => {
 
 module.exports = {
   getVisitors, 
-  getTodayRegistrations,
+  getRegistrations,
   getTotalMembers,
   getGenderAndAgeStats,  
 };

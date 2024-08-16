@@ -133,37 +133,33 @@ const getTodayRegistrations = (callback) => {
 };
 
 const getTotalMembers = (type, callback) => {
+  const todayMembersQuery = `
+    SELECT COUNT(*) AS total_members
+    FROM HM_MEMBER
+    WHERE deldt IS NULL;
+  `;
+
   let query = '';
 
   if (type === 'date') {
     query = `
       SELECT 
-        DATE_SUB(CURDATE(), INTERVAL seq DAY) AS period,
-        (
-          SELECT COUNT(*) 
-          FROM HM_MEMBER 
-          WHERE deldt IS NULL AND DATE(regdt) <= DATE_SUB(CURDATE(), INTERVAL seq DAY)
-        ) AS total_members
-      FROM 
-      (
-        SELECT 0 AS seq UNION ALL 
-        SELECT 1 UNION ALL 
-        SELECT 2 UNION ALL 
-        SELECT 3 UNION ALL 
-        SELECT 4 UNION ALL 
-        SELECT 5 UNION ALL 
-        SELECT 6
-      ) AS days
-      ORDER BY period DESC;
+        dt AS period,
+        mcnt AS total_members
+      FROM hdumduStat.STAT_DATE_MEMBER
+      WHERE dt <= CURDATE()
+      ORDER BY dt DESC
+      LIMIT 6;
     `;
   } else if (type === 'week') {
     query = `
       SELECT 
-        STR_TO_DATE(CONCAT(YEARWEEK(CURDATE(), 1) - seq, ' Monday'), '%X%V %W') AS period,
+        DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL (7 * seq) DAY), '%Y-%m-%d') AS period,
         (
-          SELECT COUNT(*) 
-          FROM HM_MEMBER 
-          WHERE deldt IS NULL AND YEARWEEK(regdt, 1) <= YEARWEEK(CURDATE(), 1) - seq
+          SELECT mcnt 
+          FROM hdumduStat.STAT_DATE_MEMBER 
+          WHERE dt = DATE_SUB(CURDATE(), INTERVAL (7 * seq) DAY)
+          LIMIT 1
         ) AS total_members
       FROM 
       (
@@ -180,9 +176,10 @@ const getTotalMembers = (type, callback) => {
       SELECT 
         DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL seq MONTH), '%Y-%m') AS period,
         (
-          SELECT COUNT(*) 
-          FROM HM_MEMBER 
-          WHERE deldt IS NULL AND DATE_FORMAT(regdt, '%Y-%m') <= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL seq MONTH), '%Y-%m')
+          SELECT mcnt 
+          FROM hdumduStat.STAT_DATE_MEMBER 
+          WHERE dt = DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL seq MONTH), '%Y-%m-01')
+          LIMIT 1
         ) AS total_members
       FROM 
       (
@@ -198,17 +195,30 @@ const getTotalMembers = (type, callback) => {
     return callback(new Error('유효하지 않은 타입입니다.'));
   }
 
+  // Execute the query for historical data
   connection.query(query, (error, results) => {
     if (error) return callback(error);
 
-    const data = results.map(row => {
-      const formattedDate = new Date(row.period).toISOString().split('T')[0];
-      return { [formattedDate]: row.total_members };
+    // Execute the query for today's members
+    connection.query(todayMembersQuery, (error, todayResults) => {
+      if (error) return callback(error);
+
+      const todayMembers = Number(todayResults[0].total_members);
+
+      // Combine today's data with historical data
+      const today = new Date().toISOString().split('T')[0];
+      results.unshift({ period: today, total_members: todayMembers });
+
+      // Format and return the data
+      const data = results.map((row, index) => {
+        const formattedDate = new Date(row.period).toISOString().split('T')[0];
+        return { [formattedDate]: row.total_members };
+      });
+
+      const response = { data };
+
+      callback(null, response);
     });
-
-    const response = { data };
-
-    callback(null, response);
   });
 };
 
