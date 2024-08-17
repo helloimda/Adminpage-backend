@@ -42,7 +42,34 @@ const getBannedUsers = (req, res) => {
   });
 };
 
+const searchBannedMembersById = (req, res) => {
+  const searchTerm = req.params.name;
+
+  userbanService.searchBannedMembersById(searchTerm, (error, results) => {
+      if (error) {
+          console.error('아이디로 밴된 회원 검색 실패:', error.message);
+          return res.status(500).send('밴된 회원 검색 중 오류가 발생했습니다.');
+      }
+      res.json(results);
+  });
+};
+
+const searchBannedMembersByNick = (req, res) => {
+  const searchTerm = req.params.name;
+
+  userbanService.searchBannedMembersByNick(searchTerm, (error, results) => {
+      if (error) {
+          console.error('닉네임으로 밴된 회원 검색 실패:', error.message);
+          return res.status(500).send('밴된 회원 검색 중 오류가 발생했습니다.');
+      }
+      res.json(results);
+  });
+};
+
+
 module.exports = {
+  searchBannedMembersById,
+  searchBannedMembersByNick,
   banUser,
   unbanUser,
   getBannedUsers,

@@ -48,7 +48,37 @@ const getBannedUsers = (page, callback) => {
   });
 };
 
+const searchBannedMembersById = (searchTerm, callback) => {
+  const query = `
+      SELECT mem_idx, mem_id, mem_nick, mem_email, mem_hp, stopdt, stop_info
+      FROM HM_MEMBER
+      WHERE isstop = 'Y' AND deldt IS NULL AND mem_id LIKE ?
+  `;
+
+  connection.query(query, [`%${searchTerm}%`], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+  });
+};
+
+const searchBannedMembersByNick = (searchTerm, callback) => {
+  const query = `
+      SELECT mem_idx, mem_id, mem_nick, mem_email, mem_hp, stopdt, stop_info
+      FROM HM_MEMBER
+      WHERE isstop = 'Y' AND deldt IS NULL AND mem_nick LIKE ?
+  `;
+
+  connection.query(query, [`%${searchTerm}%`], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+  });
+};
+
+
+
 module.exports = {
+  searchBannedMembersById,
+  searchBannedMembersByNick,
   banUser,
   unbanUser,
   getBannedUsers
