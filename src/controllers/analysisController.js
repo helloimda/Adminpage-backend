@@ -14,12 +14,14 @@ const getVisitors = (req, res) => {
 
 const getRegistrations = (req, res) => {
   const type = req.params.type;
-  analysisService.getRegistrations(type,(error, count) => {
+  analysisService.getRegistrations(type, (error, count) => {
     if (error) {
-      console.error('오늘 날짜에 가입자 수 집계 중 오류 발생:', error.message);
-      return res.status(500).send('오늘 날짜에 가입자 수 집계 중 오류가 발생했습니다.');
+      console.error("오늘 날짜에 가입자 수 집계 중 오류 발생:", error.message);
+      return res
+        .status(500)
+        .send("오늘 날짜에 가입자 수 집계 중 오류가 발생했습니다.");
     }
-    res.json({ Registrations: count });
+    res.json(count);
   });
 };
 
