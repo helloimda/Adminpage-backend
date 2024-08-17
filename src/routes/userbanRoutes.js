@@ -2,7 +2,6 @@
 const express = require('express');
 const router = express.Router();
 const userbanController = require('../controllers/userbanController');
-//members에 있는 delete userdetail사용
 
 // 회원 정지 라우트 (mem_id 기준)
 router.post('/users/ban/:memId', userbanController.banUser);
@@ -18,4 +17,6 @@ router.get('/users/search/id/:name', userbanController.searchBannedMembersById);
 
 // 특정 닉네임으로 밴된 회원 검색 라우트
 router.get('/users/search/nick/:name', userbanController.searchBannedMembersByNick);
+
+router.post('/users/delete', userbanController.deleteUsers);
 module.exports = router;

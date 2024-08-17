@@ -66,8 +66,23 @@ const searchBannedMembersByNick = (req, res) => {
   });
 };
 
+const deleteUsers = (req, res) => {
+  const memIds = req.body.memIds;
+
+  if (!Array.isArray(memIds) || memIds.length === 0) {
+      return res.status(400).json({ success: false, message: '삭제할 사용자 ID를 선택해주세요.' });
+  }
+
+  userbanService.deleteUsers(memIds, (error, message) => {
+      if (error) {
+          return res.status(500).json({ success: false, message: '회원 삭제 중 오류가 발생했습니다.', error: error.message });
+      }
+      res.json({ success: true, message: message });
+  });
+};
 
 module.exports = {
+  deleteUsers,
   searchBannedMembersById,
   searchBannedMembersByNick,
   banUser,
