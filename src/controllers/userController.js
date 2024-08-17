@@ -1,5 +1,4 @@
 const userService = require('../services/userService');
-
 const getMembers = (req, res) => {
   const page = parseInt(req.query.page) || 1;
 
@@ -84,7 +83,23 @@ const deleteUsers = (req, res) => {
     });
 };
 
+const getUserDetail = (req, res) => {
+    const memId = req.params.id;
+
+    userService.getUserDetailById(memId, (error, userDetail) => { // userbanService 대신 userService 사용
+        if (error) {
+            return res.status(500).json({ success: false, message: 'Failed to retrieve user details', error: error.message });
+        }
+        if (!userDetail) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        res.json({ success: true, data: userDetail });
+    });
+};
+
+
 module.exports = {
+  getUserDetail,
   deleteUsers,
   banUsers,
   getMembers,
