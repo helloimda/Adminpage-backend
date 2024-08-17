@@ -10,6 +10,6 @@ router.post('/users/ban/:memId', userbanController.banUser);
 router.post('/users/unban/:memId', userbanController.unbanUser);
 
 // 정지된 회원 목록을 가져오는 라우트
-router.get('/users/banned', userbanController.getBannedUsers);
+router.get('/users/bannedlist', userbanController.getBannedUsers);
 
 module.exports = router;

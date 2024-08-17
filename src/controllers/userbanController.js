@@ -15,24 +15,30 @@ const banUser = (req, res) => {
 };
 
 const unbanUser = (req, res) => {
-  const memId = req.params.memId;
+  const memIds = req.body.memIds; // 체크박스로 선택된 mem_id 배열
 
-  userbanService.unbanUser(memId, (error, message) => {
-    if (error) {
-      console.error('회원 정지 해제 실패:', error.message);
-      return res.status(500).send('회원 정지 해제 중 오류가 발생했습니다.');
-    }
-    res.send(message);
+  if (!Array.isArray(memIds) || memIds.length === 0) {
+      return res.status(400).json({ success: false, message: '해제할 사용자 ID를 선택해주세요.' });
+  }
+
+  userbanService.unbanUser(memIds, (error, message) => {
+      if (error) {
+          return res.status(500).json({ success: false, message: '회원 정지 해제 중 오류가 발생했습니다.', error: error.message });
+      }
+      res.json({ success: true, message: message });
   });
 };
 
+
 const getBannedUsers = (req, res) => {
-  userbanService.getBannedUsers((error, users) => {
+  const page = parseInt(req.params.page) || 1;
+
+  userbanService.getBannedUsers(page, (error, results) => {
     if (error) {
-      console.error('정지된 회원 목록을 가져오지 못했습니다:', error.message);
-      return res.status(500).send('회원 목록을 가져오는 중 오류가 발생했습니다.');
+      console.error('밴된 회원 리스트 불러오기 실패:', error.message);
+      return res.status(500).send('밴된 회원 리스트를 불러오는 중 오류가 발생했습니다.');
     }
-    res.json(users);
+    res.json({ success: true, data: results });
   });
 };
 
