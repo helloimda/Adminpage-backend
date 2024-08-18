@@ -88,13 +88,111 @@ const updatePostNoticeDetail = (req, res) => {
       res.send('게시글이 성공적으로 삭제되었습니다.');
     });
   };
+
+  const getGeneralPosts = (req, res) => {
+    const page = parseInt(req.params.page) || 1;
   
-module.exports = {
-  getPostNoticeDetail,
-  getNotices,
-  updatePostNoticeDetail,
-  searchPostsBySubject,  
-  searchPostsByContent,   
-  searchPostsByNick,
-  deleteMultiplePosts, 
-};
+    postmanageService.getGeneralPosts(page, (error, results) => {
+      if (error) {
+        console.error('일반 게시글 불러오기 실패:', error.message);
+        return res.status(500).send('일반 게시글을 불러오는 중 오류가 발생했습니다.');
+      }
+      res.json(results);
+    });
+  };
+
+  const getGeneralPostDetail = (req, res) => {
+    const bo_idx = req.params.id;
+  
+    postmanageService.getGeneralPostDetail(bo_idx, (error, postDetail) => {
+      if (error) {
+        console.error('일반 게시글 불러오기 실패:', error.message);
+        return res.status(500).send('일반 게시글을 불러오는 중 오류가 발생했습니다.');
+      }
+      res.json(postDetail);
+    });
+  };
+  
+  const updateGeneralPostDetail = (req, res) => {
+    const bo_idx = req.params.id;
+    const { subject, content } = req.body;
+  
+    postmanageService.updateGeneralPostDetail(bo_idx, subject, content, (error, result) => {
+      if (error) {
+        console.error('일반 게시글 업데이트 실패:', error.message);
+        return res.status(500).send('일반 게시글을 업데이트하는 중 오류가 발생했습니다.');
+      }
+      res.send('일반 게시글이 성공적으로 업데이트되었습니다.');
+    });
+  };
+  
+  const deleteMultipleGeneralPosts = (req, res) => {
+    const postIds = req.body.postIds;
+    const deldt = new Date();
+  
+    postmanageService.deleteMultipleGeneralPosts(postIds, deldt, (error, result) => {
+      if (error) {
+        console.error('일반 게시글 삭제 실패:', error.message);
+        return res.status(500).send('일반 게시글 삭제 중 오류가 발생했습니다.');
+      }
+      res.send('일반 게시글이 성공적으로 삭제되었습니다.');
+    });
+  };
+  
+  const searchGeneralPostsBySubject = (req, res) => {
+    const searchTerm = req.query.q;
+    const page = parseInt(req.query.page) || 1;
+  
+    postmanageService.searchGeneralPostsBySubject(searchTerm, page, (error, results) => {
+      if (error) {
+        console.error('일반 게시글 제목 검색 실패:', error.message);
+        return res.status(500).send('일반 게시글 제목 검색 중 오류가 발생했습니다.');
+      }
+      res.json(results);
+    });
+  };
+  
+  const searchGeneralPostsByContent = (req, res) => {
+    const searchTerm = req.query.q;
+    const page = parseInt(req.query.page) || 1;
+  
+    postmanageService.searchGeneralPostsByContent(searchTerm, page, (error, results) => {
+      if (error) {
+        console.error('일반 게시글 내용 검색 실패:', error.message);
+        return res.status(500).send('일반 게시글 내용 검색 중 오류가 발생했습니다.');
+      }
+      res.json(results);
+    });
+  };
+  
+  const searchGeneralPostsByNick = (req, res) => {
+    const searchTerm = req.query.q;
+    const page = parseInt(req.query.page) || 1;
+  
+    postmanageService.searchGeneralPostsByNick(searchTerm, page, (error, results) => {
+      if (error) {
+        console.error('일반 게시글 닉네임 검색 실패:', error.message);
+        return res.status(500).send('일반 게시글 닉네임 검색 중 오류가 발생했습니다.');
+      }
+      res.json(results);
+    });
+  };
+  
+  module.exports = {
+    getPostNoticeDetail,
+    getNotices,
+    updatePostNoticeDetail,
+    searchPostsBySubject,
+    searchPostsByContent,
+    searchPostsByNick,
+    deleteMultiplePosts,
+    getGeneralPosts,
+    getGeneralPostDetail,        
+    updateGeneralPostDetail,     
+    deleteMultipleGeneralPosts,  
+    searchGeneralPostsBySubject, 
+    searchGeneralPostsByContent, 
+    searchGeneralPostsByNick,    
+  };
+
+  

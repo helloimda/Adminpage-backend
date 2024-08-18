@@ -7,9 +7,10 @@ const getNotices = (page, callback) => {
   const query = `
     SELECT bo_idx, mem_id, subject, cnt_view, regdt
     FROM HM_BOARD_NOTICE
+    WHERE deldt IS NULL
     ORDER BY regdt DESC
     LIMIT ? OFFSET ?;
-  `;
+    `;
 
   connection.query(query, [limit, offset], (error, results) => {
     if (error) return callback(error);
@@ -135,12 +136,132 @@ const searchPostsBySubject = (searchTerm, page, callback) => {
     });
   };
 
-module.exports = {
-  getNotices,
-  getPostNoticeDetail,
-  updatePostNoticeDetail,
-  searchPostsBySubject,   
-  searchPostsByContent,   
-  searchPostsByNick,
-  deleteMultiplePosts,
-};
+  const getGeneralPosts = (page, callback) => {
+    const limit = 10;
+    const offset = (page - 1) * limit;
+  
+    const query = `
+        SELECT bo_idx, mem_id, subject, cnt_view, regdt 
+        FROM HM_BOARD 
+        WHERE deldt IS NULL
+        ORDER BY regdt DESC 
+        LIMIT ? OFFSET ?;
+    `;
+  
+    connection.query(query, [limit, offset], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+    });
+  };
+
+  const getGeneralPostDetail = (bo_idx, callback) => {
+    const query = `
+      SELECT bo_idx, mem_id, subject, content, cnt_view, regdt
+      FROM HM_BOARD
+      WHERE bo_idx = ? AND deldt IS NULL
+    `;
+  
+    connection.query(query, [bo_idx], (error, results) => {
+      if (error) return callback(error);
+      if (results.length === 0) return callback(new Error('해당 게시글을 찾을 수 없습니다.'));
+      callback(null, results[0]);
+    });
+  };
+  
+  const updateGeneralPostDetail = (bo_idx, subject, content, callback) => {
+    const query = `
+      UPDATE HM_BOARD
+      SET subject = ?, content = ?, moddt = ?
+      WHERE bo_idx = ? AND deldt IS NULL
+    `;
+  
+    const moddt = new Date(); // 현재 타임스탬프
+    connection.query(query, [subject, content, moddt, bo_idx], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+    });
+  };
+  
+  const deleteMultipleGeneralPosts = (postIds, deldt, callback) => {
+    const query = `
+      UPDATE HM_BOARD
+      SET deldt = ?
+      WHERE bo_idx IN (?) AND deldt IS NULL
+    `;
+  
+    connection.query(query, [deldt, postIds], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+    });
+  };
+  
+  const searchGeneralPostsBySubject = (searchTerm, page, callback) => {
+    const limit = 10;
+    const offset = (page - 1) * limit;
+  
+    const query = `
+      SELECT bo_idx, subject, content, regdt 
+      FROM HM_BOARD 
+      WHERE subject LIKE ? AND deldt IS NULL
+      ORDER BY bo_idx DESC 
+      LIMIT ? OFFSET ?;
+    `;
+  
+    connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+    });
+  };
+  
+  const searchGeneralPostsByContent = (searchTerm, page, callback) => {
+    const limit = 10;
+    const offset = (page - 1) * limit;
+  
+    const query = `
+      SELECT bo_idx, subject, content, regdt 
+      FROM HM_BOARD 
+      WHERE content LIKE ? AND deldt IS NULL
+      ORDER BY bo_idx DESC 
+      LIMIT ? OFFSET ?;
+    `;
+  
+    connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+    });
+  };
+  
+  const searchGeneralPostsByNick = (searchTerm, page, callback) => {
+    const limit = 10;
+    const offset = (page - 1) * limit;
+  
+    const query = `
+      SELECT bo_idx, subject, content, regdt 
+      FROM HM_BOARD 
+      WHERE mem_nick LIKE ? AND deldt IS NULL
+      ORDER BY bo_idx DESC 
+      LIMIT ? OFFSET ?;
+    `;
+  
+    connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+    });
+  };
+  
+  module.exports = {
+    getNotices,
+    getPostNoticeDetail,
+    updatePostNoticeDetail,
+    searchPostsBySubject,
+    searchPostsByContent,
+    searchPostsByNick,
+    deleteMultiplePosts,
+    getGeneralPosts,
+    getGeneralPostDetail,        
+    updateGeneralPostDetail,     
+    deleteMultipleGeneralPosts,  
+    searchGeneralPostsBySubject, 
+    searchGeneralPostsByContent, 
+    searchGeneralPostsByNick,   
+  };
