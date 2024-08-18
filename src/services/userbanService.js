@@ -1,34 +1,36 @@
 // services/userbanService.js
 const connection = require('../config/db');
 
-const banUser = (memId, stopInfo, stopDt, callback) => {
+const banUser = (memIdx, stopInfo, stopDt, callback) => {
+  console.log(`memIdx: ${memIdx}, stopInfo: ${stopInfo}, stopDt: ${stopDt}`);
   const query = `
     UPDATE HM_MEMBER
     SET isstop = 'Y', stop_info = ?, stopdt = ?
-    WHERE mem_id = ?
+    WHERE mem_idx = ? AND deldt IS NULL
   `;
 
-  connection.query(query, [stopInfo, stopDt, memId], (error, results) => {
+  connection.query(query, [stopInfo, stopDt, memIdx], (error, results) => {
     if (error) return callback(error);
-    if (results.affectedRows === 0) return callback(new Error('사용자를 찾을 수 없습니다.'));
+    if (results.affectedRows === 0) {
+      return callback(new Error('사용자를 찾을 수 없습니다.'));
+    }
     callback(null, '회원이 성공적으로 정지되었습니다.');
   });
 };
 
-const unbanUser = (memIds, callback) => {
+const unbanUser = (memIdx, callback) => {
   const query = `
     UPDATE HM_MEMBER
     SET isstop = 'N', stop_info = NULL, stopdt = NULL
-    WHERE mem_id IN (?)
+    WHERE mem_idx = ?
   `;
 
-  connection.query(query, [memIds], (error, results) => {
+  connection.query(query, [memIdx], (error, results) => {
     if (error) return callback(error);
     if (results.affectedRows === 0) return callback(new Error('사용자를 찾을 수 없습니다.'));
-    callback(null, `${results.affectedRows}명의 회원 정지가 해제되었습니다.`);
+    callback(null, `회원 정지가 성공적으로 해제되었습니다.`);
   });
 };
-
 
 const getBannedUsers = (page, callback) => {
   const limit = 10;
