@@ -179,20 +179,19 @@ const updatePostNoticeDetail = (req, res) => {
   };
   
   module.exports = {
-    getPostNoticeDetail,
     getNotices,
+    getPostNoticeDetail,
     updatePostNoticeDetail,
+    deleteMultiplePosts,
     searchPostsBySubject,
     searchPostsByContent,
     searchPostsByNick,
-    deleteMultiplePosts,
     getGeneralPosts,
-    getGeneralPostDetail,        
-    updateGeneralPostDetail,     
-    deleteMultipleGeneralPosts,  
-    searchGeneralPostsBySubject, 
-    searchGeneralPostsByContent, 
-    searchGeneralPostsByNick,    
+    getGeneralPostDetail,
+    updateGeneralPostDetail,
+    deleteMultipleGeneralPosts,
+    searchGeneralPostsBySubject,
+    searchGeneralPostsByContent,
+    searchGeneralPostsByNick,
   };
-
   
