@@ -35,7 +35,7 @@ const getBannedUsers = (page, callback) => {
   const offset = (page - 1) * limit;
 
   const query = `
-    SELECT mem_idx, mem_id, mem_nick, mem_email, mem_hp, stopdt, stop_info
+    SELECT mem_idx, mem_id, mem_nick, mem_email, mem_hp, stopdt, stop_info, mem_profile_url
     FROM HM_MEMBER
     WHERE isstop = 'Y' AND deldt IS NULL
     ORDER BY mem_idx DESC
@@ -47,6 +47,7 @@ const getBannedUsers = (page, callback) => {
     callback(null, results);
   });
 };
+
 
 const searchBannedMembersById = (searchTerm, callback) => {
   const query = `

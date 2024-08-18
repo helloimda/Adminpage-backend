@@ -75,11 +75,6 @@ const getVisitors = (type, callback) => {
 };
 
 
-
-
-
-
-
 const getRegistrations = (type, callback) => {
   let query = '';
 
