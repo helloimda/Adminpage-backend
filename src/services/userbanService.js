@@ -41,24 +41,35 @@ const unbanUser = (memIdx, callback) => {
   });
 };
 
-const getBannedUsers = (page, callback) => {
-  const limit = 10;
+const getBannedUsers = (page, limit, callback) => {
   const offset = (page - 1) * limit;
 
   const query = `
-    SELECT mem_idx, mem_id, mem_nick, mem_email, mem_hp, stopdt, stop_info, mem_profile_url
-    FROM HM_MEMBER
-    WHERE isstop = 'Y' AND deldt IS NULL
-    ORDER BY mem_idx DESC
-    LIMIT ? OFFSET ?;
+      SELECT mem_idx, mem_id, mem_nick, mem_email, mem_hp, stopdt, stop_info, mem_profile_url
+      FROM HM_MEMBER
+      WHERE isstop = 'Y' AND deldt IS NULL
+      ORDER BY mem_idx DESC
+      LIMIT ? OFFSET ?
   `;
-  
+
   connection.query(query, [limit, offset], (error, results) => {
-    if (error) return callback(error);
-    callback(null, results);
+      if (error) return callback(error);
+      callback(null, results);
   });
 };
+const getBannedUsersCount = (callback) => {
+  const query = `
+      SELECT COUNT(*) AS total
+      FROM HM_MEMBER
+      WHERE isstop = 'Y' AND deldt IS NULL
+  `;
 
+  connection.query(query, (error, results) => {
+      if (error) return callback(error);
+      const totalUsers = results[0].total;
+      callback(null, totalUsers);
+  });
+};
 
 const searchBannedMembersById = (searchTerm, callback) => {
   const query = `
@@ -108,5 +119,6 @@ module.exports = {
   searchBannedMembersByNick,
   banUser,
   unbanUser,
-  getBannedUsers
+  getBannedUsers,
+  getBannedUsersCount,
 };

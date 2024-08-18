@@ -42,16 +42,39 @@ const unbanUser = (req, res) => {
 
 const getBannedUsers = (req, res) => {
   const page = parseInt(req.params.page) || 1;
+  const limit = 10;
 
-  userbanService.getBannedUsers(page, (error, results) => {
-    if (error) {
-      console.error('밴된 회원 리스트 불러오기 실패:', error.message);
-      return res.status(500).send('밴된 회원 리스트를 불러오는 중 오류가 발생했습니다.');
-    }
-    //res.json({ success: true, data: results });
-    res.json({ success: true, data: results });
+  // 총 페이지 수 계산을 위한 전체 사용자 수 가져오기
+  userbanService.getBannedUsersCount((error, totalUsers) => {
+      if (error) {
+          console.error('밴된 회원 수 조회 실패:', error.message);
+          return res.status(500).send('밴된 회원 수를 조회하는 중 오류가 발생했습니다.');
+      }
+
+      const totalPages = Math.ceil(totalUsers / limit);
+
+      const previousPage = page > 1 ? page - 1 : null;
+      const nextPage = page < totalPages ? page + 1 : null;
+
+      userbanService.getBannedUsers(page, limit, (error, results) => {
+          if (error) {
+              console.error('밴된 회원 리스트 불러오기 실패:', error.message);
+              return res.status(500).send('밴된 회원 리스트를 불러오는 중 오류가 발생했습니다.');
+          }
+
+          res.json({
+              data: results,
+              pagination: {
+                  previousPage,
+                  nextPage,
+                  currentPage: page,
+                  totalPages,
+              },
+          });
+      });
   });
 };
+
 
 const searchBannedMembersById = (req, res) => {
   const searchTerm = req.params.name;
