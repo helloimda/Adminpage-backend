@@ -5,7 +5,7 @@ const getMembers = (page, callback) => {
     const offset = (page - 1) * limit;
     
     const query = `
-      SELECT mem_idx, mem_id, mem_nick 
+      SELECT mem_idx, mem_id, mem_nick, mem_email, mem_hp, stopdt, stop_info, mem_profile_url
       FROM HM_MEMBER 
       WHERE deldt IS NULL  -- deldt가 null인 유저들만 선택
       ORDER BY mem_idx DESC 
@@ -17,7 +17,7 @@ const getMembers = (page, callback) => {
       callback(null, results);
     });
   };
-
+  
 const searchMembersById = (searchTerm, page, callback) => {
   const limit = 10;
   const offset = (page - 1) * limit;
