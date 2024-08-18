@@ -51,10 +51,8 @@ const getBannedUsers = (req, res) => {
           return res.status(500).send('밴된 회원 수를 조회하는 중 오류가 발생했습니다.');
       }
 
-      const totalPages = Math.ceil(totalUsers / limit);
-
       const previousPage = page > 1 ? page - 1 : null;
-      const nextPage = page < totalPages ? page + 1 : null;
+      const nextPage = (page * limit) < totalUsers ? page + 1 : null;
 
       userbanService.getBannedUsers(page, limit, (error, results) => {
           if (error) {
@@ -68,12 +66,12 @@ const getBannedUsers = (req, res) => {
                   previousPage,
                   nextPage,
                   currentPage: page,
-                  totalPages,
               },
           });
       });
   });
 };
+
 
 
 const searchBannedMembersById = (req, res) => {
