@@ -4,16 +4,19 @@ const banUser = (req, res) => {
   const memIdx = req.params.mem_idx;
   const { stop_info, stopdt } = req.body;
 
-  console.log(`memIdx: ${memIdx}, stopInfo: ${stop_info}, stopDt: ${stopdt}`);
+  // req.body를 로그로 출력해 확인
+  console.log('Request body:', req.body);
 
-  if (!memIdx) {
-    return res.status(400).json({ success: false, message: 'mem_idx 값이 제공되지 않았습니다.' });
+  if (!stop_info || !stopdt) {
+    return res.status(400).json({ success: false, message: 'stop_info 또는 stopdt 값이 제공되지 않았습니다.' });
   }
+
+  console.log(`memIdx: ${memIdx}, stopInfo: ${stop_info}, stopDt: ${stopdt}`);
 
   userbanService.banUser(memIdx, stop_info, stopdt, (error, message) => {
     if (error) {
       console.error('회원 정지 실패:', error.message);
-      return res.status(500).json({ success: false, message: '회원 정지 중 오류가 발생했습니다.' });
+      return res.status(500).send('회원 정지 중 오류가 발생했습니다.');
     }
     res.json({ success: true, message: message });
   });

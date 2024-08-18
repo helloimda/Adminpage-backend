@@ -3,20 +3,29 @@ const connection = require('../config/db');
 
 const banUser = (memIdx, stopInfo, stopDt, callback) => {
   console.log(`memIdx: ${memIdx}, stopInfo: ${stopInfo}, stopDt: ${stopDt}`);
+
   const query = `
     UPDATE HM_MEMBER
     SET isstop = 'Y', stop_info = ?, stopdt = ?
     WHERE mem_idx = ? AND deldt IS NULL
   `;
 
+  console.log(`Executing query: ${query}`);
+  console.log(`With parameters: ${[stopInfo, stopDt, memIdx]}`);
+
   connection.query(query, [stopInfo, stopDt, memIdx], (error, results) => {
-    if (error) return callback(error);
+    if (error) {
+      console.error('쿼리 실행 오류:', error.message);
+      return callback(error);
+    }
     if (results.affectedRows === 0) {
+      console.log('No rows affected. Check if the mem_idx and deldt conditions match any record.');
       return callback(new Error('사용자를 찾을 수 없습니다.'));
     }
     callback(null, '회원이 성공적으로 정지되었습니다.');
   });
 };
+
 
 const unbanUser = (memIdx, callback) => {
   const query = `
