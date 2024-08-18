@@ -4,12 +4,6 @@ const connection = require('../config/db');
 const getVisitors = (type, callback) => {
   let query = '';
 
-  const todayVisitorsQuery = `
-    SELECT COUNT(*) AS daily_visitors
-    FROM HM_MEMBER
-    WHERE DATE(todaydt) = CURDATE();
-  `;
-
   if (type === 'date') {
     query = `
       SELECT 
@@ -18,33 +12,8 @@ const getVisitors = (type, callback) => {
       FROM hdumduStat.STAT_DATE_VISIT
       WHERE dt <= CURDATE()
       ORDER BY dt DESC
-      LIMIT 6;
+      LIMIT 7;
     `;
-    connection.query(query, (error, results) => {
-      if (error) return callback(error);
-
-      connection.query(todayVisitorsQuery, (error, todayResults) => {
-        if (error) return callback(error);
-
-        const todayVisitors = Number(todayResults[0].daily_visitors);
-
-        const today = new Date().toISOString().split('T')[0];
-        results.unshift({ period: today, total_visitors: todayVisitors });
-
-        const data = results.map((row, index) => {
-          let date = new Date(row.period);
-          if (index > 0) {
-            date.setDate(date.getDate() + 1);
-          }
-          const formattedDate = date.toISOString().split('T')[0];
-          return { [formattedDate]: row.total_visitors };
-        });
-
-        const response = { data };
-        return callback(null, response);
-      });
-    });
-    return;
   } else if (type === 'week') {
     query = `
       SELECT 
@@ -91,29 +60,17 @@ const getVisitors = (type, callback) => {
   connection.query(query, (error, results) => {
     if (error) return callback(error);
 
-    // 두 번째 쿼리 실행 (오늘 날짜의 방문자 수)
-    connection.query(todayVisitorsQuery, (error, todayResults) => {
-      if (error) return callback(error);
-
-      const todayVisitors = todayResults[0].daily_visitors;
-
-      // 날짜에 1일을 추가하고, week/month의 경우 합산
-      const data = results.map((row, index) => {
-        const date = new Date(row.period);
-
-        // 첫 번째 인덱스에 오늘 방문자 수를 합산 (숫자 덧셈 보장)
-        if (index === 0) {
-          row.total_visitors = Number(row.total_visitors) + Number(todayVisitors);
-        }
-
-        const formattedDate = date.toISOString().split('T')[0];
-        return { [formattedDate]: Number(row.total_visitors) }; // 숫자로 변환하여 반환
-      });
-
-      const response = { data };
-
-      callback(null, response);
+    // 날짜에 1일을 추가하고, week/month의 경우 합산
+    const data = results.map((row) => {
+      const date = new Date(row.period);
+      date.setDate(date.getDate() + 1);  // 날짜에 1일 추가
+      const formattedDate = date.toISOString().split('T')[0];
+      return { [formattedDate]: Number(row.total_visitors) }; // 숫자로 변환하여 반환
     });
+
+    const response = { data };
+
+    callback(null, response);
   });
 };
 
