@@ -15,11 +15,19 @@ router.get('/postmanage/notice/search/nick', postmanageController.searchPostsByN
 // 일반 게시글 라우트
 router.get('/postmanage/general/:page', postmanageController.getGeneralPosts); 
 router.get('/postmanage/general/detail/:id', postmanageController.getGeneralPostDetail);
-router.post('/postmanage/general/detail/:id', postmanageController.updateGeneralPostDetail);
 router.post('/postmanage/general/delete', postmanageController.deleteMultipleGeneralPosts);
 
 router.get('/postmanage/general/search/subject', postmanageController.searchGeneralPostsBySubject);
 router.get('/postmanage/general/search/content', postmanageController.searchGeneralPostsByContent);
 router.get('/postmanage/general/search/nick', postmanageController.searchGeneralPostsByNick);
+
+
+// 사기 피해 게시글 라우트
+router.get('/postmanage/fraud/:page', postmanageController.getFraudPosts);
+router.get('/postmanage/fraud/detail/:id', postmanageController.getFraudPostDetail);
+router.post('/postmanage/fraud/delete', postmanageController.deleteMultipleFraudPosts);
+
+router.get('/postmanage/fraud/search/memid', postmanageController.searchFraudPostsByMemId);
+router.get('/postmanage/fraud/search/goodname', postmanageController.searchFraudPostsByGoodName);
 
 module.exports = router;

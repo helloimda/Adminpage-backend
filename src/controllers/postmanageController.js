@@ -113,18 +113,6 @@ const updatePostNoticeDetail = (req, res) => {
     });
   };
   
-  const updateGeneralPostDetail = (req, res) => {
-    const bo_idx = req.params.id;
-    const { subject, content } = req.body;
-  
-    postmanageService.updateGeneralPostDetail(bo_idx, subject, content, (error, result) => {
-      if (error) {
-        console.error('일반 게시글 업데이트 실패:', error.message);
-        return res.status(500).send('일반 게시글을 업데이트하는 중 오류가 발생했습니다.');
-      }
-      res.send('일반 게시글이 성공적으로 업데이트되었습니다.');
-    });
-  };
   
   const deleteMultipleGeneralPosts = (req, res) => {
     const postIds = req.body.postIds;
@@ -178,6 +166,71 @@ const updatePostNoticeDetail = (req, res) => {
     });
   };
   
+  const getFraudPosts = (req, res) => {
+    const page = parseInt(req.params.page) || 1;
+  
+    postmanageService.getFraudPosts(page, (error, results) => {
+      if (error) {
+        console.error('사기 피해 게시글 불러오기 실패:', error.message);
+        return res.status(500).send('사기 피해 게시글을 불러오는 중 오류가 발생했습니다.');
+      }
+      res.json(results);
+    });
+  };
+  const getFraudPostDetail = (req, res) => {
+    const bof_idx = req.params.id;
+  
+    postmanageService.getFraudPostDetail(bof_idx, (error, postDetail) => {
+      if (error) {
+        console.error('사기 피해 게시글 불러오기 실패:', error.message);
+        return res.status(500).send('사기 피해 게시글을 불러오는 중 오류가 발생했습니다.');
+      }
+      res.json(postDetail);
+    });
+  };
+  
+
+  
+  const deleteMultipleFraudPosts = (req, res) => {
+    const postIds = req.body.postIds;
+    const deldt = new Date();
+  
+    postmanageService.deleteMultipleFraudPosts(postIds, deldt, (error, result) => {
+      if (error) {
+        console.error('사기 피해 게시글 삭제 실패:', error.message);
+        return res.status(500).send('사기 피해 게시글 삭제 중 오류가 발생했습니다.');
+      }
+      res.send('사기 피해 게시글이 성공적으로 삭제되었습니다.');
+    });
+  };
+  
+  
+  const searchFraudPostsByGoodName = (req, res) => {
+    const searchTerm = req.query.q;
+    const page = parseInt(req.query.page) || 1;
+  
+    postmanageService.searchFraudPostsByGoodName(searchTerm, page, (error, results) => {
+      if (error) {
+        console.error('사기 피해 게시글 상품명 검색 실패:', error.message);
+        return res.status(500).send('사기 피해 게시글 상품명 검색 중 오류가 발생했습니다.');
+      }
+      res.json(results);
+    });
+  };
+  
+  const searchFraudPostsByMemId = (req, res) => {
+    const searchTerm = req.query.q;
+    const page = parseInt(req.query.page) || 1;
+  
+    postmanageService.searchFraudPostsByMemId(searchTerm, page, (error, results) => {
+      if (error) {
+        console.error('사기 피해 게시글 회원 ID 검색 실패:', error.message);
+        return res.status(500).send('사기 피해 게시글 회원 ID 검색 중 오류가 발생했습니다.');
+      }
+      res.json(results);
+    });
+  };
+
   module.exports = {
     getNotices,
     getPostNoticeDetail,
@@ -188,10 +241,14 @@ const updatePostNoticeDetail = (req, res) => {
     searchPostsByNick,
     getGeneralPosts,
     getGeneralPostDetail,
-    updateGeneralPostDetail,
     deleteMultipleGeneralPosts,
     searchGeneralPostsBySubject,
     searchGeneralPostsByContent,
     searchGeneralPostsByNick,
+    getFraudPosts,
+    getFraudPostDetail,
+    deleteMultipleFraudPosts,
+    searchFraudPostsByGoodName,
+    searchFraudPostsByMemId,  
   };
   

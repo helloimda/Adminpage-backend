@@ -168,20 +168,6 @@ const searchPostsBySubject = (searchTerm, page, callback) => {
     });
   };
   
-  const updateGeneralPostDetail = (bo_idx, subject, content, callback) => {
-    const query = `
-      UPDATE HM_BOARD
-      SET subject = ?, content = ?, moddt = ?
-      WHERE bo_idx = ? AND deldt IS NULL
-    `;
-  
-    const moddt = new Date(); // 현재 타임스탬프
-    connection.query(query, [subject, content, moddt, bo_idx], (error, results) => {
-      if (error) return callback(error);
-      callback(null, results);
-    });
-  };
-  
   const deleteMultipleGeneralPosts = (postIds, deldt, callback) => {
     const query = `
       UPDATE HM_BOARD
@@ -248,7 +234,88 @@ const searchPostsBySubject = (searchTerm, page, callback) => {
       callback(null, results);
     });
   };
+
+  const getFraudPosts = (page, callback) => {
+    const limit = 10;
+    const offset = (page - 1) * limit;
   
+    const query = `
+      SELECT bof_idx, mem_id, bof_type, gd_name, damage_dt, damage_type, cnt_view, regdt
+      FROM HM_BOARD_FRAUD
+      WHERE deldt IS NULL
+      ORDER BY regdt DESC
+      LIMIT ? OFFSET ?;
+    `;
+  
+    connection.query(query, [limit, offset], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+    });
+  };
+  
+  const getFraudPostDetail = (bof_idx, callback) => {
+    const query = `
+      SELECT bof_idx, mem_id, bof_type, gd_name, damage_dt, damage_type, cnt_view, regdt
+      FROM HM_BOARD_FRAUD
+      WHERE bof_idx = ? AND deldt IS NULL
+    `;
+  
+    connection.query(query, [bof_idx], (error, results) => {
+      if (error) return callback(error);
+      if (results.length === 0) return callback(new Error('해당 게시글을 찾을 수 없습니다.'));
+      callback(null, results[0]);
+    });
+  };
+  
+  
+  const deleteMultipleFraudPosts = (postIds, deldt, callback) => {
+    const query = `
+      UPDATE HM_BOARD_FRAUD
+      SET deldt = ?
+      WHERE bof_idx IN (?) AND deldt IS NULL
+    `;
+  
+    connection.query(query, [deldt, postIds], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+    });
+  };
+  
+  const searchFraudPostsByGoodName = (searchTerm, page, callback) => {
+    const limit = 10;
+    const offset = (page - 1) * limit;
+  
+    const query = `
+      SELECT bof_idx, bof_type, gd_name, damage_dt, damage_type, cnt_view, regdt 
+      FROM HM_BOARD_FRAUD 
+      WHERE gd_name LIKE ? AND deldt IS NULL
+      ORDER BY bof_idx DESC 
+      LIMIT ? OFFSET ?;
+    `;
+  
+    connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+    });
+  };
+  const searchFraudPostsByMemId = (searchTerm, page, callback) => {
+    const limit = 10;
+    const offset = (page - 1) * limit;
+  
+    const query = `
+      SELECT bof_idx, bof_type, gd_name, damage_dt, damage_type, cnt_view, regdt 
+      FROM HM_BOARD_FRAUD 
+      WHERE mem_id LIKE ? AND deldt IS NULL
+      ORDER BY bof_idx DESC 
+      LIMIT ? OFFSET ?;
+    `;
+  
+    connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+    });
+  };
+
   module.exports = {
     getNotices,
     getPostNoticeDetail,
@@ -258,10 +325,14 @@ const searchPostsBySubject = (searchTerm, page, callback) => {
     searchPostsByNick,
     deleteMultiplePosts,
     getGeneralPosts,
-    getGeneralPostDetail,        
-    updateGeneralPostDetail,     
+    getGeneralPostDetail,          
     deleteMultipleGeneralPosts,  
     searchGeneralPostsBySubject, 
     searchGeneralPostsByContent, 
     searchGeneralPostsByNick,   
+    getFraudPosts,
+    getFraudPostDetail,           
+    deleteMultipleFraudPosts,   
+    searchFraudPostsByMemId,    
+    searchFraudPostsByGoodName, 
   };
