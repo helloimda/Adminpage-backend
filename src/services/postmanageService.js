@@ -255,7 +255,9 @@ const searchPostsBySubject = (searchTerm, page, callback) => {
   
   const getFraudPostDetail = (bof_idx, callback) => {
     const query = `
-      SELECT bof_idx, mem_id, bof_type, gd_name, damage_dt, damage_type, cnt_view, regdt
+      SELECT bof_idx, mem_id, bof_type, gd_name, content, account_num, account_bank, msg_type, 
+             msg_id, damage_amount, damage_dt, damage_type, hp, sex, email, url, cnt_img, 
+             cnt_view, regdt
       FROM HM_BOARD_FRAUD
       WHERE bof_idx = ? AND deldt IS NULL
     `;
@@ -263,9 +265,32 @@ const searchPostsBySubject = (searchTerm, page, callback) => {
     connection.query(query, [bof_idx], (error, results) => {
       if (error) return callback(error);
       if (results.length === 0) return callback(new Error('해당 게시글을 찾을 수 없습니다.'));
-      callback(null, results[0]);
+      
+      const postDetail = results[0];
+  
+      // cnt_img가 1개 이상이면 이미지 정보 조회
+      if (postDetail.cnt_img > 0) {
+        const imageQuery = `
+          SELECT file_name, file_url
+          FROM HM_BOARD_FRAUD_IMG
+          WHERE bof_idx = ?
+        `;
+        
+        connection.query(imageQuery, [bof_idx], (imgError, imgResults) => {
+          if (imgError) return callback(imgError);
+          
+          // 이미지 정보를 postDetail에 추가
+          postDetail.images = imgResults;
+          
+          callback(null, postDetail);
+        });
+      } else {
+        // 이미지가 없는 경우 바로 결과 반환
+        callback(null, postDetail);
+      }
     });
   };
+  
   
   
   const deleteMultipleFraudPosts = (postIds, deldt, callback) => {
