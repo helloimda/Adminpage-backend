@@ -46,9 +46,22 @@ const getGenderAndAgeStats = (req, res) => {
   });
 };
 
+const getPostAnalysis = (req, res) => {
+  const type = req.params.type;
+
+  analysisService.getPostCounts(type, (error, results) => {
+    if (error) {
+      console.error('분석 데이터 불러오기 실패:', error.message);
+      return res.status(500).send('분석 데이터를 불러오는 중 오류가 발생했습니다.');
+    }
+    res.json(results);
+  });
+};
+
 module.exports = {
   getVisitors, 
   getRegistrations,
   getTotalMembers,
   getGenderAndAgeStats,  
+  getPostAnalysis,
 };

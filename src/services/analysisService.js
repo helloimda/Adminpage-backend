@@ -348,9 +348,86 @@ const getGenderAndAgeStats = (callback) => {
 };
 
 
+const getPostCounts = (type, callback) => {
+  let query = '';
+
+  if (type === 'date') {
+    query = `
+      SELECT 
+        DATE(regdt) AS period,
+        COUNT(*) AS total_posts
+      FROM HM_BOARD
+      WHERE regdt >= CURDATE() - INTERVAL 6 DAY
+      GROUP BY DATE(regdt)
+      ORDER BY DATE(regdt) DESC;
+    `;
+  } else if (type === 'week') {
+    query = `
+      SELECT 
+        DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL (7 * seq) DAY), '%Y-%m-%d') AS period,
+        (
+          SELECT COUNT(*)
+          FROM HM_BOARD
+          WHERE regdt >= DATE_SUB(CURDATE(), INTERVAL (7 * seq + 6) DAY)
+          AND regdt <= DATE_SUB(CURDATE(), INTERVAL (7 * seq) DAY)
+        ) AS total_posts
+      FROM 
+      (
+        SELECT 0 AS seq UNION ALL
+        SELECT 1 UNION ALL
+        SELECT 2 UNION ALL
+        SELECT 3 UNION ALL
+        SELECT 4
+      ) AS weeks
+      ORDER BY period DESC;
+    `;
+  } else if (type === 'month') {
+    query = `
+      SELECT 
+        DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL seq MONTH), '%Y-%m') AS period,
+        (
+          SELECT COUNT(*)
+          FROM HM_BOARD
+          WHERE regdt >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL seq MONTH), '%Y-%m-01')
+          AND regdt < DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL (seq - 1) MONTH), '%Y-%m-01')
+        ) AS total_posts
+      FROM 
+      (
+        SELECT 0 AS seq UNION ALL
+        SELECT 1 UNION ALL
+        SELECT 2 UNION ALL
+        SELECT 3 UNION ALL
+        SELECT 4
+      ) AS months
+      ORDER BY period DESC;
+    `;
+  } else {
+    return callback(new Error('유효하지 않은 타입입니다.'));
+  }
+
+  connection.query(query, (error, results) => {
+    if (error) return callback(error);
+
+    // 날짜 포맷 처리
+    const data = results.map((row) => {
+      const date = new Date(row.period);
+      const formattedDate = date.toISOString().split('T')[0];
+      return { [formattedDate]: Number(row.total_posts) };
+    });
+
+    const response = { data };
+
+    callback(null, response);
+  });
+};
+
+
+
+
 module.exports = {
   getVisitors,
   getRegistrations,
   getTotalMembers,
   getGenderAndAgeStats,  
+  getPostCounts,
 };
