@@ -133,24 +133,25 @@ const getBannedUsersCountByNick = (searchTerm, callback) => {
 
 
 
-const deleteUsers = (memIds, callback) => {
+const deleteUser = (memIdx, callback) => {
   const query = `
     UPDATE HM_MEMBER
     SET deldt = NOW()
-    WHERE mem_id IN (?)
+    WHERE mem_idx = ?
   `;
 
-  connection.query(query, [memIds], (error, results) => {
+  connection.query(query, [memIdx], (error, results) => {
     if (error) return callback(error);
     if (results.affectedRows === 0) return callback(new Error('사용자를 찾을 수 없습니다.'));
-    callback(null, `${results.affectedRows}명의 회원이 삭제되었습니다.`);
+    callback(null, '회원이 성공적으로 삭제되었습니다.');
   });
 };
 
 
 
+
 module.exports = {
-  deleteUsers,
+  deleteUser,
   searchBannedMembersById,
   searchBannedMembersByNick,
   banUser,

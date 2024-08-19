@@ -142,23 +142,24 @@ const searchBannedMembersByNick = (req, res) => {
 };
 
 
-const deleteUsers = (req, res) => {
-  const memIdxs = req.body.memIdxs;  // 수정: memIds -> memIdxs
+const deleteUser = (req, res) => {
+  const memIdx = req.params.mem_idx;  // URL 파라미터로 mem_idx를 받음
 
-  if (!Array.isArray(memIdxs) || memIdxs.length === 0) {
-      return res.status(400).json({ success: false, message: '삭제할 사용자 ID를 선택해주세요.' });
+  if (!memIdx) {
+      return res.status(400).json({  message: '삭제할 사용자 ID가 제공되지 않았습니다.' });
   }
 
-  userbanService.deleteUsers(memIdxs, (error, message) => {
+  userbanService.deleteUser(memIdx, (error, message) => {
       if (error) {
-          return res.status(500).json({ success: false, message: '회원 삭제 중 오류가 발생했습니다.', error: error.message });
+          return res.status(500).json({  message: '회원 삭제 중 오류가 발생했습니다.', error: error.message });
       }
-      res.json({ success: true, message: message });
+      res.json({  message: message });
   });
 };
 
+
 module.exports = {
-  deleteUsers,
+  deleteUser,
   searchBannedMembersById,
   searchBannedMembersByNick,
   banUser,

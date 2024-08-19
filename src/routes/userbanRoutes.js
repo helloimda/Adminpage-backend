@@ -18,5 +18,5 @@ router.get('/users/search/id/:name', userbanController.searchBannedMembersById);
 // 특정 닉네임으로 밴된 회원 검색 라우트
 router.get('/users/search/nick/:name', userbanController.searchBannedMembersByNick);
 
-router.post('/users/delete', userbanController.deleteUsers);
+router.post('/users/delete/:mem_idx', userbanController.deleteUser);
 module.exports = router;
