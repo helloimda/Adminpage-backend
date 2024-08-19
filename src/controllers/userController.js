@@ -152,9 +152,9 @@ const getMembers = (req, res) => {
     userService.getUserDetailById(memIdx, (error, userDetail) => {
         if (error) {
             console.error('유저 상세 정보 조회 실패:', error.message);
-            return res.status(500).json({ success: false, message: '유저 상세 정보를 조회하는 중 오류가 발생했습니다.' });
+            return res.status(500).json({ message: '유저 상세 정보를 조회하는 중 오류가 발생했습니다.' });
         }
-        res.json({ success: true, data: userDetail });
+        res.json({ data: userDetail });
     });
 };
 
