@@ -1,41 +1,105 @@
 const userService = require('../services/userService');
+
 const getMembers = (req, res) => {
-  const page = parseInt(req.query.page) || 1;
+    const page = parseInt(req.params.page) || 1;
+    const limit = 10;
+  
+    userService.getMembersCount((error, totalMembers) => {
+      if (error) {
+        console.error('회원 수 조회 실패:', error.message);
+        return res.status(500).send('회원 수 조회 중 오류가 발생했습니다.');
+      }
+  
+      const totalPages = Math.ceil(totalMembers / limit);
+      const previousPage = page > 1 ? page - 1 : null;
+      const nextPage = page < totalPages ? page + 1 : null;
+  
+      userService.getMembers(page, limit, (error, results) => {
+        if (error) {
+          console.error('회원 리스트 불러오기 실패:', error.message);
+          return res.status(500).send('회원 리스트를 불러오는 중 오류가 발생했습니다.');
+        }
+  
+        res.json({
+          data: results,
+          pagination: {
+            previousPage,
+            nextPage,
+            currentPage: page,
+            totalPages,
+          },
+        });
+      });
+    });
+  };
 
-  userService.getMembers(page, (error, results) => {
-    if (error) {
-      console.error('회원 리스트 불러오기 실패:', error.message);
-      return res.status(500).send('회원 리스트를 불러오는 중 오류가 발생했습니다.');
-    }
-    res.json(results);
-  });
-};
-
-const searchMembersById = (req, res) => {
-  const searchTerm = req.query.q || '';
-  const page = parseInt(req.query.page) || 1;
-
-  userService.searchMembersById(searchTerm, page, (error, results) => {
-    if (error) {
-      console.error('아이디로 회원 검색 실패:', error.message);
-      return res.status(500).send('회원 검색 중 오류가 발생했습니다.');
-    }
-    res.json(results);
-  });
-};
-
-const searchMembersByNick = (req, res) => {
-  const searchTerm = req.query.q || '';
-  const page = parseInt(req.query.page) || 1;
-
-  userService.searchMembersByNick(searchTerm, page, (error, results) => {
-    if (error) {
-      console.error('닉네임으로 회원 검색 실패:', error.message);
-      return res.status(500).send('회원 검색 중 오류가 발생했습니다.');
-    }
-    res.json(results);
-  });
-};
+  const searchMembersById = (req, res) => {
+    const searchTerm = req.params.name;
+    const page = parseInt(req.params.page) || 1;
+    const limit = 10;
+  
+    userService.getSearchMembersCountById(searchTerm, (error, totalMembers) => {
+      if (error) {
+        console.error('회원 수 조회 실패:', error.message);
+        return res.status(500).send('회원 수 조회 중 오류가 발생했습니다.');
+      }
+  
+      const totalPages = Math.ceil(totalMembers / limit);
+      const previousPage = page > 1 ? page - 1 : null;
+      const nextPage = page < totalPages ? page + 1 : null;
+  
+      userService.searchMembersById(searchTerm, page, (error, results) => {
+        if (error) {
+          console.error('회원 검색 실패:', error.message);
+          return res.status(500).send('회원 검색 중 오류가 발생했습니다.');
+        }
+  
+        res.json({
+          data: results,
+          pagination: {
+            previousPage,
+            nextPage,
+            currentPage: page,
+            totalPages,
+          },
+        });
+      });
+    });
+  };
+  
+  const searchMembersByNick = (req, res) => {
+    const searchTerm = req.params.name;
+    const page = parseInt(req.params.page) || 1;
+    const limit = 10;
+  
+    userService.getSearchMembersCountByNick(searchTerm, (error, totalMembers) => {
+      if (error) {
+        console.error('회원 수 조회 실패:', error.message);
+        return res.status(500).send('회원 수 조회 중 오류가 발생했습니다.');
+      }
+  
+      const totalPages = Math.ceil(totalMembers / limit);
+      const previousPage = page > 1 ? page - 1 : null;
+      const nextPage = page < totalPages ? page + 1 : null;
+  
+      userService.searchMembersByNick(searchTerm, page, (error, results) => {
+        if (error) {
+          console.error('회원 검색 실패:', error.message);
+          return res.status(500).send('회원 검색 중 오류가 발생했습니다.');
+        }
+  
+        res.json({
+          data: results,
+          pagination: {
+            previousPage,
+            nextPage,
+            currentPage: page,
+            totalPages,
+          },
+        });
+      });
+    });
+  };
 
 const banUsers = (req, res) => {
     const userIds = req.body.userIds;

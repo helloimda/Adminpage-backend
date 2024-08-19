@@ -1,58 +1,96 @@
 const connection = require('../config/db');
 
-const getMembers = (page, callback) => {
-    const limit = 10;
+const getMembers = (page, limit, callback) => {
     const offset = (page - 1) * limit;
-    
+  
     const query = `
-      SELECT mem_idx, mem_id, mem_nick, mem_email, mem_hp, stopdt, stop_info, mem_profile_url
-      FROM HM_MEMBER 
-      WHERE deldt IS NULL  -- deldt가 null인 유저들만 선택
-      ORDER BY mem_idx DESC 
-      LIMIT ? OFFSET ?;
+      SELECT mem_idx, mem_id, mem_nick, mem_email, mem_hp,stopdt, stop_info, mem_profile_url
+      FROM HM_MEMBER
+      WHERE deldt IS NULL
+      ORDER BY mem_idx DESC
+      LIMIT ? OFFSET ?
     `;
-    
+  
     connection.query(query, [limit, offset], (error, results) => {
       if (error) return callback(error);
       callback(null, results);
     });
   };
   
-const searchMembersById = (searchTerm, page, callback) => {
-  const limit = 10;
-  const offset = (page - 1) * limit;
+  const getMembersCount = (callback) => {
+    const query = `
+      SELECT COUNT(*) AS total
+      FROM HM_MEMBER
+      WHERE deldt IS NULL
+    `;
   
-  const query = `
-    SELECT mem_idx, mem_id, mem_nick 
-    FROM HM_MEMBER 
-    WHERE mem_id LIKE ? 
-    ORDER BY mem_idx DESC 
-    LIMIT ? OFFSET ?;
-  `;
-  
-  connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
-    if (error) return callback(error);
-    callback(null, results);
-  });
-};
+    connection.query(query, (error, results) => {
+      if (error) return callback(error);
+      callback(null, results[0].total);
+    });
+  };
 
-const searchMembersByNick = (searchTerm, page, callback) => {
-  const limit = 10;
-  const offset = (page - 1) * limit;
+  const searchMembersById = (searchTerm, page, callback) => {
+    const limit = 10;
+    const offset = (page - 1) * limit;
+    
+    const query = `
+      SELECT mem_idx, mem_id, mem_nick, mem_email, mem_hp, mem_profile_url, stopdt, stop_info
+      FROM HM_MEMBER 
+      WHERE mem_id LIKE ? AND deldt IS NULL
+      ORDER BY mem_idx DESC 
+      LIMIT ? OFFSET ?;
+    `;
+    
+    connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+    });
+  };
   
-  const query = `
-    SELECT mem_idx, mem_id, mem_nick 
-    FROM HM_MEMBER 
-    WHERE mem_nick LIKE ? 
-    ORDER BY mem_idx DESC 
-    LIMIT ? OFFSET ?;
-  `;
+  const searchMembersByNick = (searchTerm, page, callback) => {
+    const limit = 10;
+    const offset = (page - 1) * limit;
+    
+    const query = `
+      SELECT mem_idx, mem_id, mem_nick, mem_email, mem_hp, mem_profile_url, stopdt, stop_info
+      FROM HM_MEMBER 
+      WHERE mem_nick LIKE ? AND deldt IS NULL
+      ORDER BY mem_idx DESC 
+      LIMIT ? OFFSET ?;
+    `;
+    
+    connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+    });
+  };
   
-  connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
-    if (error) return callback(error);
-    callback(null, results);
-  });
-};
+  const getSearchMembersCountById = (searchTerm, callback) => {
+    const query = `
+      SELECT COUNT(*) AS total
+      FROM HM_MEMBER
+      WHERE mem_id LIKE ? AND deldt IS NULL
+    `;
+  
+    connection.query(query, [`%${searchTerm}%`], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results[0].total);
+    });
+  };
+  
+  const getSearchMembersCountByNick = (searchTerm, callback) => {
+    const query = `
+      SELECT COUNT(*) AS total
+      FROM HM_MEMBER
+      WHERE mem_nick LIKE ? AND deldt IS NULL
+    `;
+  
+    connection.query(query, [`%${searchTerm}%`], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results[0].total);
+    });
+  };
 
 const banMultipleUsers = (userIds, stopInfo, stopDt, callback) => {
     const query = `
@@ -99,6 +137,9 @@ module.exports = {
   deleteMultipleUsers,
   banMultipleUsers,
   getMembers,
+  getMembersCount,
   searchMembersById,
   searchMembersByNick,
+  getSearchMembersCountById,
+  getSearchMembersCountByNick,
 };
