@@ -130,42 +130,37 @@ const getMembers = (req, res) => {
   
 
 
-const deleteUsers = (req, res) => {
-    const userIds = req.body.userIds;
-
-    // userIds가 배열이 아니거나, 비어있다면 에러 반환
-    if (!Array.isArray(userIds) || userIds.length === 0) {
-        return res.status(400).json({ success: false, message: 'No user IDs provided' });
+  const deleteUser = (req, res) => {
+    const memIdx = req.params.mem_idx;  // URL 파라미터로 mem_idx를 받음
+  
+    if (!memIdx) {
+        return res.status(400).json({  message: '삭제할 사용자 ID가 제공되지 않았습니다.' });
     }
-
-    const deldt = new Date().toISOString();  // 현재 날짜를 ISO 형식으로 설정
-
-    userbanService.deleteMultipleUsers(userIds, deldt, (error, result) => {
+  
+    userService.deleteUser(memIdx, (error, message) => {
         if (error) {
-            return res.status(500).json({ success: false, message: 'Failed to delete users', error: error.message });
+            return res.status(500).json({  message: '회원 삭제 중 오류가 발생했습니다.', error: error.message });
         }
-        res.json({ success: true, message: 'Users deleted successfully', result: result });
+        res.json({  message: message });
     });
-};
+  };
 
-const getUserDetail = (req, res) => {
-    const memId = req.params.id;
 
-    userService.getUserDetailById(memId, (error, userDetail) => { // userbanService 대신 userService 사용
+  const getUserDetail = (req, res) => {
+    const memIdx = req.params.mem_idx;  // 라우팅 경로에 맞게 mem_idx로 변경
+
+    userService.getUserDetailById(memIdx, (error, userDetail) => {
         if (error) {
-            return res.status(500).json({ success: false, message: 'Failed to retrieve user details', error: error.message });
-        }
-        if (!userDetail) {
-            return res.status(404).json({ success: false, message: 'User not found' });
+            console.error('유저 상세 정보 조회 실패:', error.message);
+            return res.status(500).json({ success: false, message: '유저 상세 정보를 조회하는 중 오류가 발생했습니다.' });
         }
         res.json({ success: true, data: userDetail });
     });
 };
 
-
 module.exports = {
   getUserDetail,
-  deleteUsers,
+  deleteUser,
   banUser,
   getMembers,
   searchMembersById,

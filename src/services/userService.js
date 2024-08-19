@@ -110,35 +110,39 @@ const getMembers = (page, limit, callback) => {
   };
 
   
-const deleteMultipleUsers = (userIds, deldt, callback) => {
+  const deleteUser = (memIdx, callback) => {
     const query = `
       UPDATE HM_MEMBER
-      SET deldt = ?
-      WHERE mem_id IN (?)
+      SET deldt = NOW()
+      WHERE mem_idx = ?
     `;
   
-    connection.query(query, [deldt, userIds], (error, results) => {
+    connection.query(query, [memIdx], (error, results) => {
       if (error) return callback(error);
-      callback(null, results);
+      if (results.affectedRows === 0) return callback(new Error('사용자를 찾을 수 없습니다.'));
+      callback(null, '회원이 성공적으로 삭제되었습니다.');
     });
-  };  
+  };
+  
 
-  const getUserDetailById = (memId, callback) => {
+  const getUserDetailById = (memIdx, callback) => {
     const query = `
-        SELECT mem_id, mem_nick, mem_email, mem_hp, mem_profile_url, todaydt, isadmin  -- 올바른 컬럼 이름으로 수정
+        SELECT mem_idx, mem_id, mem_nick, mem_email, mem_hp, mem_profile_url, todaydt, isadmin
         FROM HM_MEMBER
-        WHERE mem_id = ?
+        WHERE mem_idx = ?
     `;
 
-    connection.query(query, [memId], (error, results) => {
+    connection.query(query, [memIdx], (error, results) => {
         if (error) return callback(error);
+        console.log("Query Results for mem_idx:", memIdx, results);  // 결과 출력
         if (results.length === 0) return callback(null, null);
         callback(null, results[0]);
     });
 };
+
 module.exports = {
   getUserDetailById,
-  deleteMultipleUsers,
+  deleteUser,
   banUser,
   getMembers,
   getMembersCount,
