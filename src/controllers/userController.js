@@ -101,33 +101,34 @@ const getMembers = (req, res) => {
     });
   };
 
-const banUsers = (req, res) => {
-    const userIds = req.body.userIds;
-    const stopInfo = req.body.stopInfo;
-    const stopDt = req.body.stopDt;
+  const banUser = (req, res) => {
+    const memIdx = req.params.mem_idx; // URL에서 mem_idx를 받음
+    const { stop_info, stopdt } = req.body; // 요청 본문에서 stop_info와 stopdt를 받음
   
-    // userIds가 배열이 아니거나, 비어있다면 에러 반환
-    if (!Array.isArray(userIds) || userIds.length === 0) {
-        return res.status(400).json({ success: false, message: 'No user IDs provided' });
+    // 요청 본문을 로그로 출력하여 데이터 확인
+    console.log('Request body:', req.body);
+  
+    // stop_info나 stopdt가 제공되지 않았을 경우 에러 반환
+    if (!stop_info || !stopdt) {
+      return res.status(400).json({ success: false, message: 'stop_info 또는 stopdt 값이 제공되지 않았습니다.' });
     }
-
-    // stopInfo가 제공되지 않으면 에러 반환
-    if (!stopInfo || typeof stopInfo !== 'string') {
-        return res.status(400).json({ success: false, message: 'No stop info provided or stop info is invalid' });
-    }
-
-    // stopDt가 제공되지 않으면 에러 반환
-    if (!stopDt || isNaN(new Date(stopDt))) {
-        return res.status(400).json({ success: false, message: 'No stop date provided or stop date is invalid' });
-    }
-
-    userbanService.banMultipleUsers(userIds, stopInfo, stopDt, (error, result) => {
-        if (error) {
-            return res.status(500).json({ success: false, message: 'Failed to ban users', error: error.message });
-        }
-        res.json({ success: true, message: 'Users banned successfully', result: result });
+  
+    // 로그로 memIdx, stop_info, stopdt 값 출력
+    console.log(`memIdx: ${memIdx}, stopInfo: ${stop_info}, stopDt: ${stopdt}`);
+  
+    // 서비스 레이어에서 사용자 밴 처리 호출
+    userService.banUser(memIdx, stop_info, stopdt, (error, message) => {
+      if (error) {
+        console.error('회원 정지 실패:', error.message);
+        return res.status(500).send('회원 정지 중 오류가 발생했습니다.');
+      }
+      // 성공 시 응답
+      res.json({ success: true, message: message });
     });
-};
+  };
+  
+  
+
 
 const deleteUsers = (req, res) => {
     const userIds = req.body.userIds;
@@ -165,7 +166,7 @@ const getUserDetail = (req, res) => {
 module.exports = {
   getUserDetail,
   deleteUsers,
-  banUsers,
+  banUser,
   getMembers,
   searchMembersById,
   searchMembersByNick,

@@ -92,16 +92,20 @@ const getMembers = (page, limit, callback) => {
     });
   };
 
-const banMultipleUsers = (userIds, stopInfo, stopDt, callback) => {
+  const banUser = (memIdx, stopInfo, stopDt, callback) => {
     const query = `
       UPDATE HM_MEMBER
       SET isstop = 'Y', stop_info = ?, stopdt = ?
-      WHERE mem_id IN (?)
+      WHERE mem_idx = ? AND deldt IS NULL
     `;
   
-    connection.query(query, [stopInfo, stopDt, userIds], (error, results) => {
+    // 정지 정보를 업데이트하는 쿼리 실행
+    connection.query(query, [stopInfo, stopDt, memIdx], (error, results) => {
       if (error) return callback(error);
-      callback(null, results);
+      if (results.affectedRows === 0) {
+        return callback(new Error('해당 사용자를 찾을 수 없습니다.'));
+      }
+      callback(null, '회원이 성공적으로 정지되었습니다.');
     });
   };
 
@@ -135,7 +139,7 @@ const deleteMultipleUsers = (userIds, deldt, callback) => {
 module.exports = {
   getUserDetailById,
   deleteMultipleUsers,
-  banMultipleUsers,
+  banUser,
   getMembers,
   getMembersCount,
   searchMembersById,
