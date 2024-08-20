@@ -3,15 +3,11 @@ const connection = require('../config/db');
 
 const banUser = (memIdx, stopInfo, stopDt, callback) => {
   console.log(`memIdx: ${memIdx}, stopInfo: ${stopInfo}, stopDt: ${stopDt}`);
-
   const query = `
     UPDATE HM_MEMBER
     SET isstop = 'Y', stop_info = ?, stopdt = ?
     WHERE mem_idx = ? AND deldt IS NULL
   `;
-
-  console.log(`Executing query: ${query}`);
-  console.log(`With parameters: ${[stopInfo, stopDt, memIdx]}`);
 
   connection.query(query, [stopInfo, stopDt, memIdx], (error, results) => {
     if (error) {
