@@ -175,24 +175,35 @@ const searchPostsByNick = (searchTerm, page, callback) => {
 
 
 
-  const getGeneralPosts = (page, callback) => {
-    const limit = 10;
-    const offset = (page - 1) * limit;
-  
-    const query = `
-        SELECT bo_idx, mem_id, subject, cnt_view, regdt 
-        FROM HM_BOARD 
-        WHERE deldt IS NULL
-        ORDER BY regdt DESC 
-        LIMIT ? OFFSET ?;
-    `;
-  
-    connection.query(query, [limit, offset], (error, results) => {
+const getGeneralPosts = (page, limit, callback) => {
+  const offset = (page - 1) * limit;
+
+  const query = `
+      SELECT bo_idx, mem_id, subject, cnt_view, cnt_star, cnt_good, cnt_bed, cnt_comment, regdt
+      FROM HM_BOARD 
+      WHERE deldt IS NULL
+      ORDER BY regdt DESC 
+      LIMIT ? OFFSET ?;
+  `;
+
+  connection.query(query, [limit, offset], (error, results) => {
       if (error) return callback(error);
       callback(null, results);
-    });
-  };
+  });
+};
+const getGeneralPostsCount = (callback) => {
+  const query = `
+      SELECT COUNT(*) AS total
+      FROM HM_BOARD 
+      WHERE deldt IS NULL;
+  `;
 
+  connection.query(query, (error, results) => {
+      if (error) return callback(error);
+      const totalPosts = results[0].total;
+      callback(null, totalPosts);
+  });
+};
   const getGeneralPostDetail = (bo_idx, callback) => {
     const query = `
       SELECT bo_idx, mem_id, subject, content, cnt_view, regdt
@@ -207,18 +218,19 @@ const searchPostsByNick = (searchTerm, page, callback) => {
     });
   };
   
-  const deleteMultipleGeneralPosts = (postIds, deldt, callback) => {
+  const deleteGeneralPost = (postId, deldt, callback) => {
     const query = `
       UPDATE HM_BOARD
       SET deldt = ?
-      WHERE bo_idx IN (?) AND deldt IS NULL
+      WHERE bo_idx = ? AND deldt IS NULL
     `;
   
-    connection.query(query, [deldt, postIds], (error, results) => {
-      if (error) return callback(error);
-      callback(null, results);
+    connection.query(query, [deldt, postId], (error, results) => {
+        if (error) return callback(error);
+        callback(null, results);
     });
-  };
+};
+
   
   const searchGeneralPostsBySubject = (searchTerm, page, callback) => {
     const limit = 10;
@@ -391,8 +403,9 @@ const searchPostsByNick = (searchTerm, page, callback) => {
     searchPostsByNick,
     deletePost,
     getGeneralPosts,
+    getGeneralPostsCount,
     getGeneralPostDetail,          
-    deleteMultipleGeneralPosts,  
+    deleteGeneralPost,  
     searchGeneralPostsBySubject, 
     searchGeneralPostsByContent, 
     searchGeneralPostsByNick,   

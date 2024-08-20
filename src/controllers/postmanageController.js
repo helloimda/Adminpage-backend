@@ -160,17 +160,38 @@ const searchPostsByNick = (req, res) => {
 };
 
 
-  const getGeneralPosts = (req, res) => {
-    const page = parseInt(req.params.page) || 1;
-  
-    postmanageService.getGeneralPosts(page, (error, results) => {
+const getGeneralPosts = (req, res) => {
+  const page = parseInt(req.params.page) || 1;
+  const limit = 10;
+
+  postmanageService.getGeneralPostsCount((error, totalPosts) => {
       if (error) {
-        console.error('일반 게시글 불러오기 실패:', error.message);
-        return res.status(500).send('일반 게시글을 불러오는 중 오류가 발생했습니다.');
+          console.error('게시글 수 조회 실패:', error.message);
+          return res.status(500).send('게시글 수를 조회하는 중 오류가 발생했습니다.');
       }
-      res.json(results);
-    });
-  };
+
+      const totalPages = Math.ceil(totalPosts / limit);
+      const previousPage = page > 1 ? page - 1 : null;
+      const nextPage = page < totalPages ? page + 1 : null;
+
+      postmanageService.getGeneralPosts(page, limit, (error, results) => {
+          if (error) {
+              console.error('일반 게시글 불러오기 실패:', error.message);
+              return res.status(500).send('일반 게시글을 불러오는 중 오류가 발생했습니다.');
+          }
+
+          res.json({
+              data: results,
+              pagination: {
+                  previousPage,
+                  nextPage,
+                  currentPage: page,
+                  totalPages,
+              },
+          });
+      });
+  });
+};
 
   const getGeneralPostDetail = (req, res) => {
     const bo_idx = req.params.id;
@@ -185,18 +206,22 @@ const searchPostsByNick = (req, res) => {
   };
   
   
-  const deleteMultipleGeneralPosts = (req, res) => {
-    const postIds = req.body.postIds;
-    const deldt = new Date();
-  
-    postmanageService.deleteMultipleGeneralPosts(postIds, deldt, (error, result) => {
-      if (error) {
-        console.error('일반 게시글 삭제 실패:', error.message);
-        return res.status(500).send('일반 게시글 삭제 중 오류가 발생했습니다.');
-      }
-      res.send('일반 게시글이 성공적으로 삭제되었습니다.');
+  const deleteGeneralPost = (req, res) => {
+    const postId = req.params.id;  // URL 파라미터에서 게시글 ID를 받음
+    const deldt = new Date();  // 현재 시간으로 deldt 설정
+
+    postmanageService.deleteGeneralPost(postId, deldt, (error, result) => {
+        if (error) {
+            console.error('일반 게시글 삭제 실패:', error.message);
+            return res.status(500).send('일반 게시글 삭제 중 오류가 발생했습니다.');
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).send('해당 게시글을 찾을 수 없습니다.');
+        }
+        res.send('일반 게시글이 성공적으로 삭제되었습니다.');
     });
-  };
+};
+
   
   const searchGeneralPostsBySubject = (req, res) => {
     const searchTerm = req.query.q;
@@ -312,7 +337,7 @@ const searchPostsByNick = (req, res) => {
     searchPostsByNick,
     getGeneralPosts,
     getGeneralPostDetail,
-    deleteMultipleGeneralPosts,
+    deleteGeneralPost,
     searchGeneralPostsBySubject,
     searchGeneralPostsByContent,
     searchGeneralPostsByNick,
