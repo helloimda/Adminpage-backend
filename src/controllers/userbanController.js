@@ -77,7 +77,7 @@ const getBannedUsers = (req, res) => {
 
 const searchBannedMembersById = (req, res) => {
   const searchTerm = req.params.name;
-  const page = parseInt(req.query.page) || 1;
+  const page = parseInt(req.params.page) || 1;
   const limit = 10;
 
   userbanService.getBannedUsersCountById(searchTerm, (error, totalUsers) => {
@@ -110,7 +110,7 @@ const searchBannedMembersById = (req, res) => {
 
 const searchBannedMembersByNick = (req, res) => {
   const searchTerm = req.params.name;
-  const page = parseInt(req.query.page) || 1;
+  const page = parseInt(req.params.page) || 1;
   const limit = 10;
 
   userbanService.getBannedUsersCountByNick(searchTerm, (error, totalUsers) => {
