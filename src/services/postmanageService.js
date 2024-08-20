@@ -82,72 +82,98 @@ const updatePostNoticeDetail = (bo_idx, subject, content, callback) => {
     });
 };
 
+
+
 const searchPostsBySubject = (searchTerm, page, callback) => {
-    const limit = 10;
-    const offset = (page - 1) * limit;
-    
-    const query = `
-      SELECT bo_idx, subject, content, regdt 
-      FROM HM_BOARD_NOTICE 
-      WHERE subject LIKE ? 
-      ORDER BY bo_idx DESC 
-      LIMIT ? OFFSET ?;
-    `;
-    
-    connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
-      if (error) return callback(error);
-      callback(null, results);
-    });
-  };
+  const limit = 10;
+  const offset = (page - 1) * limit;
   
-  const searchPostsByContent = (searchTerm, page, callback) => {
-    const limit = 10;
-    const offset = (page - 1) * limit;
-    
-    const query = `
-      SELECT bo_idx, subject, content, regdt 
-      FROM HM_BOARD_NOTICE 
-      WHERE content LIKE ? 
-      ORDER BY bo_idx DESC 
-      LIMIT ? OFFSET ?;
-    `;
-    
-    connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
-      if (error) return callback(error);
-      callback(null, results);
-    });
-  };
+  const query = `
+    SELECT bo_idx, mem_id, subject, cnt_view, cnt_star, cnt_good, cnt_bed, cnt_comment, regdt
+    FROM HM_BOARD_NOTICE 
+    WHERE subject LIKE ? 
+    AND deldt IS NULL
+    ORDER BY bo_idx DESC 
+    LIMIT ? OFFSET ?;
+  `;
+  
+  connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+    if (error) return callback(error);
+    callback(null, results);
+  });
+};
 
-  const searchPostsByNick = (searchTerm, page, callback) => {
-    const limit = 10;
-    const offset = (page - 1) * limit;
-    
-    const query = `
-      SELECT bo_idx, subject, content, regdt 
-      FROM HM_BOARD_NOTICE 
-      WHERE mem_nick LIKE ? 
-      ORDER BY bo_idx DESC 
-      LIMIT ? OFFSET ?;
-    `;
-    
-    connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
-      if (error) return callback(error);
-      callback(null, results);
-    });
-  };
+const getTotalCountBySubject = (searchTerm, callback) => {
+  const query = `
+    SELECT COUNT(*) AS total 
+    FROM HM_BOARD_NOTICE 
+    WHERE subject LIKE ? 
+    AND deldt IS NULL
+  `;
+  
+  connection.query(query, [`%${searchTerm}%`], (error, results) => {
+    if (error) return callback(error);
+    callback(null, results[0].total);
+  });
+};
 
-  const deleteMultiplePosts = (postIds, deldt, callback) => {
+const searchPostsByContent = (searchTerm, page, callback) => {
+  const limit = 10;
+  const offset = (page - 1) * limit;
+  
+  const query = `
+    SELECT bo_idx, mem_id, subject, cnt_view, cnt_star, cnt_good, cnt_bed, cnt_comment, regdt 
+    FROM HM_BOARD_NOTICE 
+    WHERE content LIKE ? 
+    AND deldt IS NULL
+    ORDER BY bo_idx DESC 
+    LIMIT ? OFFSET ?;
+  `;
+  
+  connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+    if (error) return callback(error);
+    callback(null, results);
+  });
+};
+
+
+
+const searchPostsByNick = (searchTerm, page, callback) => {
+  const limit = 10;
+  const offset = (page - 1) * limit;
+  
+  const query = `
+    SELECT bo_idx, mem_id, subject, cnt_view, cnt_star, cnt_good, cnt_bed, cnt_comment, regdt 
+    FROM HM_BOARD_NOTICE 
+    WHERE mem_id LIKE ? 
+    AND deldt IS NULL
+    ORDER BY bo_idx DESC 
+    LIMIT ? OFFSET ?;
+  `;
+  
+  connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+    if (error) return callback(error);
+    callback(null, results);
+  });
+};
+
+
+  const deletePost = (postId, deldt, callback) => {
+    console.log(`Deleting post with ID: ${postId}, deldt: ${deldt}`); // 로그 추가
+
     const query = `
       UPDATE HM_BOARD_NOTICE
       SET deldt = ?
-      WHERE bo_idx IN (?)
+      WHERE bo_idx = ?
     `;
-  
-    connection.query(query, [deldt, postIds], (error, results) => {
-      if (error) return callback(error);
-      callback(null, results);
+
+    connection.query(query, [deldt, postId], (error, results) => {
+        if (error) return callback(error);
+        callback(null, results);
     });
-  };
+};
+
+
 
   const getGeneralPosts = (page, callback) => {
     const limit = 10;
@@ -360,9 +386,10 @@ const searchPostsBySubject = (searchTerm, page, callback) => {
     getPostNoticeDetail,
     updatePostNoticeDetail,
     searchPostsBySubject,
+    getTotalCountBySubject,
     searchPostsByContent,
     searchPostsByNick,
-    deleteMultiplePosts,
+    deletePost,
     getGeneralPosts,
     getGeneralPostDetail,          
     deleteMultipleGeneralPosts,  

@@ -60,56 +60,105 @@ const updatePostNoticeDetail = (req, res) => {
   };
 
   const searchPostsBySubject = (req, res) => {
-    const searchTerm = req.query.q;
-    const page = parseInt(req.query.page) || 1;
-  
+    const searchTerm = req.params.name;
+    const page = parseInt(req.params.page) || 1;
+
     postmanageService.searchPostsBySubject(searchTerm, page, (error, results) => {
-      if (error) {
-        console.error('게시글 검색 실패:', error.message);
-        return res.status(500).send('게시글 검색 중 오류가 발생했습니다.');
-      }
-      res.json(results);
-    });
-  };
-  
-  const searchPostsByContent = (req, res) => {
-    const searchTerm = req.query.q;
-    const page = parseInt(req.query.page) || 1;
-  
-    postmanageService.searchPostsByContent(searchTerm, page, (error, results) => {
-      if (error) {
-        console.error('게시글 검색 실패:', error.message);
-        return res.status(500).send('게시글 검색 중 오류가 발생했습니다.');
-      }
-      res.json(results);
-    });
-  };
+        if (error) {
+            console.error('게시글 검색 실패:', error.message);
+            return res.status(500).send('게시글 검색 중 오류가 발생했습니다.');
+        }
 
-  const searchPostsByNick = (req, res) => {
-    const searchTerm = req.query.q;
-    const page = parseInt(req.query.page) || 1;
-  
-    postmanageService.searchPostsByNick(searchTerm, page, (error, results) => {
-      if (error) {
-        console.error('게시글 닉네임 검색 실패:', error.message);
-        return res.status(500).send('게시글 닉네임 검색 중 오류가 발생했습니다.');
-      }
-      res.json(results);
-    });
-  };
+        postmanageService.getTotalCountBySubject(searchTerm, (error, totalCount) => {
+            if (error) {
+                console.error('총 게시글 수 조회 실패:', error.message);
+                return res.status(500).send('총 게시글 수 조회 중 오류가 발생했습니다.');
+            }
 
-  const deleteMultiplePosts = (req, res) => {
-    const postIds = req.body.postIds; // 삭제할 게시글 ID 배열
+            const totalPages = Math.ceil(totalCount / 10);
+            const previousPage = page > 1 ? page - 1 : null;
+            const nextPage = page < totalPages ? page + 1 : null;
+
+            res.json({
+                results: results,
+                pagination: {
+                    previousPage: previousPage,
+                    nextPage: nextPage,
+                    currentPage: page,
+                    totalPages: totalPages
+                }
+            });
+        });
+    });
+};
+
+
+  
+const searchPostsByContent = (req, res) => {
+  const searchTerm = req.params.name;
+  const page = parseInt(req.params.page) || 1;
+
+  postmanageService.searchPostsByContent(searchTerm, page, (error, results) => {
+      if (error) {
+          console.error('게시글 검색 실패:', error.message);
+          return res.status(500).send('게시글 검색 중 오류가 발생했습니다.');
+      }
+
+      const totalPages = Math.ceil(results.length / 10);
+      const pagination = {
+          previousPage: page > 1 ? page - 1 : null,
+          nextPage: page < totalPages ? page + 1 : null,
+          currentPage: page,
+          totalPages: totalPages,
+      };
+
+      res.json({
+          results: results,
+          pagination: pagination
+      });
+  });
+};
+
+
+
+const searchPostsByNick = (req, res) => {
+  const searchTerm = req.params.name;
+  const page = parseInt(req.params.page) || 1;
+
+  postmanageService.searchPostsByNick(searchTerm, page, (error, results, totalResults) => {
+    if (error) {
+      console.error('게시글 닉네임 검색 실패:', error.message);
+      return res.status(500).send('게시글 닉네임 검색 중 오류가 발생했습니다.');
+    }
+    
+    const totalPages = Math.ceil(totalResults / 10);
+    const pagination = {
+        previousPage: page > 1 ? page - 1 : null,
+        nextPage: page < totalPages ? page + 1 : null,
+        currentPage: page,
+        totalPages: totalPages,
+    };
+
+    res.json({
+        results: results,
+        pagination: pagination,
+    });
+  });
+};
+
+  const deletePost = (req, res) => {
+    const postId = req.params.id; // URL 파라미터로 받은 게시글 ID
     const deldt = new Date(); // 삭제 시점의 타임스탬프
-  
-    postmanageService.deleteMultiplePosts(postIds, deldt, (error, result) => {
-      if (error) {
-        console.error('게시글 삭제 실패:', error.message);
-        return res.status(500).send('게시글 삭제 중 오류가 발생했습니다.');
-      }
-      res.send('게시글이 성공적으로 삭제되었습니다.');
+
+    postmanageService.deletePost(postId, deldt, (error, result) => {
+        if (error) {
+            console.error('게시글 삭제 실패:', error.message);
+            return res.status(500).send('게시글 삭제 중 오류가 발생했습니다.');
+        }
+        res.send('게시글이 성공적으로 삭제되었습니다.');
     });
-  };
+};
+
 
   const getGeneralPosts = (req, res) => {
     const page = parseInt(req.params.page) || 1;
@@ -257,7 +306,7 @@ const updatePostNoticeDetail = (req, res) => {
     getNotices,
     getPostNoticeDetail,
     updatePostNoticeDetail,
-    deleteMultiplePosts,
+    deletePost,
     searchPostsBySubject,
     searchPostsByContent,
     searchPostsByNick,

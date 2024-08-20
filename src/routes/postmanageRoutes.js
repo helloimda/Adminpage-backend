@@ -6,12 +6,12 @@ const postmanageController = require('../controllers/postmanageController');
 router.get('/postmanage/notice/:page', postmanageController.getNotices);
 router.get('/postmanage/notice/detail/:id', postmanageController.getPostNoticeDetail);
 router.post('/postmanage/notice/detail/:id', postmanageController.updatePostNoticeDetail);
-router.post('/postmanage/notice/delete', postmanageController.deleteMultiplePosts);  
+router.post('/postmanage/notice/delete/:id', postmanageController.deletePost);  
 
-router.get('/postmanage/notice/search/subject', postmanageController.searchPostsBySubject);
-router.get('/postmanage/notice/search/content', postmanageController.searchPostsByContent);
-router.get('/postmanage/notice/search/nick', postmanageController.searchPostsByNick);
-
+router.get('/postmanage/notice/search/subject/:name/:page', postmanageController.searchPostsBySubject);
+router.get('/postmanage/notice/search/content/:name/:page', postmanageController.searchPostsByContent);
+router.get('/postmanage/notice/search/nick/:name/:page', postmanageController.searchPostsByNick);
+//여기까지 완료 아래부터 수정
 // 일반 게시글 라우트
 router.get('/postmanage/general/:page', postmanageController.getGeneralPosts); 
 router.get('/postmanage/general/detail/:id', postmanageController.getGeneralPostDetail);
