@@ -232,23 +232,35 @@ const getGeneralPostsCount = (callback) => {
 };
 
   
-  const searchGeneralPostsBySubject = (searchTerm, page, callback) => {
-    const limit = 10;
-    const offset = (page - 1) * limit;
-  
-    const query = `
-      SELECT bo_idx, subject, content, regdt 
-      FROM HM_BOARD 
-      WHERE subject LIKE ? AND deldt IS NULL
-      ORDER BY bo_idx DESC 
-      LIMIT ? OFFSET ?;
-    `;
-  
-    connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+const searchGeneralPostsBySubject = (searchTerm, page, limit, callback) => {
+  const offset = (page - 1) * limit;
+
+  const query = `
+    SELECT bo_idx, mem_id, subject, cnt_view, cnt_star, cnt_good, cnt_bad, cnt_comment, regdt
+    FROM HM_BOARD
+    WHERE subject LIKE ? AND deldt IS NULL
+    ORDER BY regdt DESC
+    LIMIT ? OFFSET ?;
+  `;
+
+  connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+    if (error) return callback(error);
+    callback(null, results);
+  });
+};
+const getGeneralPostsCountBySubject = (searchTerm, callback) => {
+  const query = `
+      SELECT COUNT(*) AS total
+      FROM HM_BOARD
+      WHERE subject LIKE ? AND deldt IS NULL;
+  `;
+
+  connection.query(query, [`%${searchTerm}%`], (error, results) => {
       if (error) return callback(error);
-      callback(null, results);
-    });
-  };
+      callback(null, results[0].total);
+  });
+};
+
   
   const searchGeneralPostsByContent = (searchTerm, page, callback) => {
     const limit = 10;
@@ -407,6 +419,7 @@ const getGeneralPostsCount = (callback) => {
     getGeneralPostDetail,          
     deleteGeneralPost,  
     searchGeneralPostsBySubject, 
+    getGeneralPostsCountBySubject,
     searchGeneralPostsByContent, 
     searchGeneralPostsByNick,   
     getFraudPosts,

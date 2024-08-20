@@ -17,7 +17,7 @@ router.get('/postmanage/general/:page', postmanageController.getGeneralPosts);
 router.get('/postmanage/general/detail/:id', postmanageController.getGeneralPostDetail);
 router.post('/postmanage/general/delete/:id', postmanageController.deleteGeneralPost);
 
-router.get('/postmanage/general/search/subject', postmanageController.searchGeneralPostsBySubject);
+router.get('/postmanage/general/search/subject/:id/:page', postmanageController.searchGeneralPostsBySubject);
 router.get('/postmanage/general/search/content', postmanageController.searchGeneralPostsByContent);
 router.get('/postmanage/general/search/nick', postmanageController.searchGeneralPostsByNick);
 
