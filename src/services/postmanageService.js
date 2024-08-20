@@ -262,41 +262,57 @@ const getGeneralPostsCountBySubject = (searchTerm, callback) => {
 };
 
   
-  const searchGeneralPostsByContent = (searchTerm, page, callback) => {
-    const limit = 10;
-    const offset = (page - 1) * limit;
-  
-    const query = `
-      SELECT bo_idx, subject, content, regdt 
-      FROM HM_BOARD 
-      WHERE content LIKE ? AND deldt IS NULL
-      ORDER BY bo_idx DESC 
-      LIMIT ? OFFSET ?;
-    `;
-  
-    connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+const searchGeneralPostsByContent = (searchTerm, page, limit, callback) => {
+  const offset = (page - 1) * limit;
+
+  const query = `
+    SELECT bo_idx, mem_id, subject, cnt_view, cnt_star, cnt_good, cnt_bad, cnt_comment, regdt 
+    FROM HM_BOARD 
+    WHERE content LIKE ? AND deldt IS NULL
+    ORDER BY bo_idx DESC 
+    LIMIT ? OFFSET ?;
+  `;
+
+  connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
       if (error) return callback(error);
       callback(null, results);
-    });
-  };
+  });
+};
+
+
   
-  const searchGeneralPostsByNick = (searchTerm, page, callback) => {
-    const limit = 10;
-    const offset = (page - 1) * limit;
-  
-    const query = `
-      SELECT bo_idx, subject, content, regdt 
-      FROM HM_BOARD 
-      WHERE mem_nick LIKE ? AND deldt IS NULL
-      ORDER BY bo_idx DESC 
-      LIMIT ? OFFSET ?;
-    `;
-  
-    connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+const getGeneralPostsCountByContent = (searchTerm, callback) => {
+  const query = `
+    SELECT COUNT(*) AS total 
+    FROM HM_BOARD 
+    WHERE content LIKE ? AND deldt IS NULL
+  `;
+
+  connection.query(query, [`%${searchTerm}%`], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results[0].total);
+  });
+};
+const searchGeneralPostsByNick = (searchTerm, page, limit, callback) => {
+  const offset = (page - 1) * limit;
+
+  const query = `
+    SELECT b.bo_idx, b.mem_id, m.mem_nick, b.subject, b.cnt_view, b.cnt_star, b.cnt_good, b.cnt_bad, b.cnt_comment, b.regdt
+    FROM HM_BOARD b
+    JOIN HM_MEMBER m ON b.mem_id = m.mem_id
+    WHERE m.mem_nick LIKE ? AND b.deldt IS NULL
+    ORDER BY b.bo_idx DESC 
+    LIMIT ? OFFSET ?;
+  `;
+
+  connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
       if (error) return callback(error);
       callback(null, results);
-    });
-  };
+  });
+};
+
+
+
 
   const getFraudPosts = (page, callback) => {
     const limit = 10;
@@ -420,6 +436,7 @@ const getGeneralPostsCountBySubject = (searchTerm, callback) => {
     deleteGeneralPost,  
     searchGeneralPostsBySubject, 
     getGeneralPostsCountBySubject,
+    getGeneralPostsCountByContent,
     searchGeneralPostsByContent, 
     searchGeneralPostsByNick,   
     getFraudPosts,

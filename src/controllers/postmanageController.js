@@ -258,31 +258,66 @@ const searchGeneralPostsBySubject = (req, res) => {
 
 
   
-  const searchGeneralPostsByContent = (req, res) => {
-    const searchTerm = req.query.q;
-    const page = parseInt(req.query.page) || 1;
-  
-    postmanageService.searchGeneralPostsByContent(searchTerm, page, (error, results) => {
+const searchGeneralPostsByContent = (req, res) => {
+  const searchTerm = req.params.id; // req.query.q 대신 req.params.id 사용
+  const page = parseInt(req.params.page) || 1;
+  const limit = 10;
+
+  postmanageService.searchGeneralPostsByContent(searchTerm, page, limit, (error, results) => {
       if (error) {
-        console.error('일반 게시글 내용 검색 실패:', error.message);
-        return res.status(500).send('일반 게시글 내용 검색 중 오류가 발생했습니다.');
+          console.error('일반 게시글 내용 검색 실패:', error.message);
+          return res.status(500).send('일반 게시글 내용 검색 중 오류가 발생했습니다.');
       }
-      res.json(results);
-    });
-  };
+
+      postmanageService.getGeneralPostsCountByContent(searchTerm, (error, totalPosts) => {
+          if (error) {
+              console.error('총 게시글 수 조회 실패:', error.message);
+              return res.status(500).send('총 게시글 수 조회 중 오류가 발생했습니다.');
+          }
+
+          const totalPages = Math.ceil(totalPosts / limit);
+          const previousPage = page > 1 ? page - 1 : null;
+          const nextPage = page < totalPages ? page + 1 : null;
+
+          res.json({
+              data: results,
+              pagination: {
+                  previousPage,
+                  nextPage,
+                  currentPage: page,
+                  totalPages,
+              },
+          });
+      });
+  });
+};
+
   
-  const searchGeneralPostsByNick = (req, res) => {
-    const searchTerm = req.query.q;
-    const page = parseInt(req.query.page) || 1;
-  
-    postmanageService.searchGeneralPostsByNick(searchTerm, page, (error, results) => {
-      if (error) {
-        console.error('일반 게시글 닉네임 검색 실패:', error.message);
-        return res.status(500).send('일반 게시글 닉네임 검색 중 오류가 발생했습니다.');
-      }
-      res.json(results);
+const searchGeneralPostsByNick = (req, res) => {
+  const searchTerm = req.params.id;
+  const page = parseInt(req.params.page) || 1;
+  const limit = 10;
+
+  postmanageService.searchGeneralPostsByNick(searchTerm, page, limit, (error, results) => {
+    if (error) {
+      console.error('일반 게시글 닉네임 검색 실패:', error.message);
+      return res.status(500).send('일반 게시글 닉네임 검색 중 오류가 발생했습니다.');
+    }
+    res.json({
+        data: results,
+        pagination: {
+            previousPage: page > 1 ? page - 1 : null,
+            nextPage: results.length === limit ? page + 1 : null,
+            currentPage: page,
+            totalPages: results.length === limit ? page + 1 : page,
+        },
     });
-  };
+  });
+};
+
+
+
+
   
   const getFraudPosts = (req, res) => {
     const page = parseInt(req.params.page) || 1;

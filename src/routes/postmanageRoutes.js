@@ -11,17 +11,17 @@ router.post('/postmanage/notice/delete/:id', postmanageController.deletePost);
 router.get('/postmanage/notice/search/subject/:name/:page', postmanageController.searchPostsBySubject);
 router.get('/postmanage/notice/search/content/:name/:page', postmanageController.searchPostsByContent);
 router.get('/postmanage/notice/search/nick/:name/:page', postmanageController.searchPostsByNick);
-//여기까지 완료 아래부터 수정
+
 // 일반 게시글 라우트
 router.get('/postmanage/general/:page', postmanageController.getGeneralPosts); 
 router.get('/postmanage/general/detail/:id', postmanageController.getGeneralPostDetail);
 router.post('/postmanage/general/delete/:id', postmanageController.deleteGeneralPost);
 
 router.get('/postmanage/general/search/subject/:id/:page', postmanageController.searchGeneralPostsBySubject);
-router.get('/postmanage/general/search/content', postmanageController.searchGeneralPostsByContent);
-router.get('/postmanage/general/search/nick', postmanageController.searchGeneralPostsByNick);
+router.get('/postmanage/general/search/content/:id/:page', postmanageController.searchGeneralPostsByContent);
+router.get('/postmanage/general/search/nick/:id/:page', postmanageController.searchGeneralPostsByNick);
 
-
+//여기까지 완료 아래부터 수정해야함
 // 사기 피해 게시글 라우트
 router.get('/postmanage/fraud/:page', postmanageController.getFraudPosts);
 router.get('/postmanage/fraud/detail/:id', postmanageController.getFraudPostDetail);
