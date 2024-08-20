@@ -3,7 +3,7 @@ const router = express.Router();
 const postmanageController = require('../controllers/postmanageController');
 
 // 공지사항 리스트를 가져오는 라우트
-router.get('/postmanage/notices/:page', postmanageController.getNotices);
+router.get('/postmanage/notice/:page', postmanageController.getNotices);
 router.get('/postmanage/notice/detail/:id', postmanageController.getPostNoticeDetail);
 router.post('/postmanage/notice/detail/:id', postmanageController.updatePostNoticeDetail);
 router.post('/postmanage/notice/delete', postmanageController.deleteMultiplePosts);  

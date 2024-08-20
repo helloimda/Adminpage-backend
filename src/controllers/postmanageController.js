@@ -2,15 +2,37 @@ const postmanageService = require('../services/postmanageService');
 
 const getNotices = (req, res) => {
   const page = parseInt(req.params.page) || 1; // URL에서 페이지 번호를 가져옵니다.
+  const limit = 10;
 
-  postmanageService.getNotices(page, (error, results) => {
+  postmanageService.getNotices(page, limit, (error, results) => {
     if (error) {
       console.error('공지사항 불러오기 실패:', error.message);
       return res.status(500).send('공지사항을 불러오는 중 오류가 발생했습니다.');
     }
-    res.json(results);
+
+    postmanageService.getNoticesCount((error, totalNotices) => {
+      if (error) {
+        console.error('공지사항 수 조회 실패:', error.message);
+        return res.status(500).send('공지사항 수를 조회하는 중 오류가 발생했습니다.');
+      }
+
+      const totalPages = Math.ceil(totalNotices / limit);
+      const previousPage = page > 1 ? page - 1 : null;
+      const nextPage = page < totalPages ? page + 1 : null;
+
+      res.json({
+        data: results,
+        pagination: {
+          previousPage,
+          nextPage,
+          currentPage: page,
+          totalPages,
+        },
+      });
+    });
   });
 };
+
 
 const getPostNoticeDetail = (req, res) => {
   const bo_idx = req.params.id;

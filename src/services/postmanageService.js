@@ -1,7 +1,6 @@
 const connection = require('../config/db');
 
-const getNotices = (page, callback) => {
-  const limit = 10;
+const getNotices = (page, limit, callback) => {
   const offset = (page - 1) * limit;
 
   const query = `
@@ -10,13 +9,27 @@ const getNotices = (page, callback) => {
     WHERE deldt IS NULL
     ORDER BY regdt DESC
     LIMIT ? OFFSET ?;
-    `;
+  `;
 
   connection.query(query, [limit, offset], (error, results) => {
     if (error) return callback(error);
     callback(null, results);
   });
 };
+
+const getNoticesCount = (callback) => {
+  const query = `
+    SELECT COUNT(*) AS totalNotices
+    FROM HM_BOARD_NOTICE
+    WHERE deldt IS NULL;
+  `;
+
+  connection.query(query, (error, results) => {
+    if (error) return callback(error);
+    callback(null, results[0].totalNotices);
+  });
+};
+
 
 const getPostNoticeDetail = (bo_idx, callback) => {
     const query = `
@@ -343,6 +356,7 @@ const searchPostsBySubject = (searchTerm, page, callback) => {
 
   module.exports = {
     getNotices,
+    getNoticesCount,
     getPostNoticeDetail,
     updatePostNoticeDetail,
     searchPostsBySubject,
