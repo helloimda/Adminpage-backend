@@ -319,17 +319,41 @@ const searchGeneralPostsByNick = (req, res) => {
 
 
   
-  const getFraudPosts = (req, res) => {
-    const page = parseInt(req.params.page) || 1;
-  
-    postmanageService.getFraudPosts(page, (error, results) => {
+const getFraudPosts = (req, res) => {
+  const page = parseInt(req.params.page) || 1;
+  const limit = 10;
+
+  postmanageService.getFraudPostsCount((error, totalPosts) => {
       if (error) {
-        console.error('사기 피해 게시글 불러오기 실패:', error.message);
-        return res.status(500).send('사기 피해 게시글을 불러오는 중 오류가 발생했습니다.');
+          console.error('사기 피해 게시글 수 조회 실패:', error.message);
+          return res.status(500).send('사기 피해 게시글 수 조회 중 오류가 발생했습니다.');
       }
-      res.json(results);
-    });
-  };
+
+      const totalPages = Math.ceil(totalPosts / limit);
+      const previousPage = page > 1 ? page - 1 : null;
+      const nextPage = page < totalPages ? page + 1 : null;
+
+      postmanageService.getFraudPosts(page, limit, (error, results) => {
+          if (error) {
+              console.error('사기 피해 게시글 불러오기 실패:', error.message);
+              return res.status(500).send('사기 피해 게시글을 불러오는 중 오류가 발생했습니다.');
+          }
+
+          res.json({
+              data: results,
+              pagination: {
+                  previousPage,
+                  nextPage,
+                  currentPage: page,
+                  totalPages,
+              },
+          });
+      });
+  });
+};
+
+
+
   const getFraudPostDetail = (req, res) => {
     const bof_idx = req.params.id;
   

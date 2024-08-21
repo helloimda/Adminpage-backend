@@ -312,25 +312,34 @@ const searchGeneralPostsByNick = (searchTerm, page, limit, callback) => {
 };
 
 
+const getFraudPostsCount = (callback) => {
+  const query = `
+      SELECT COUNT(*) AS total
+      FROM HM_BOARD_FRAUD
+      WHERE deldt IS NULL;
+  `;
 
+  connection.query(query, (error, results) => {
+      if (error) return callback(error);
+      callback(null, results[0].total);
+  });
+};
+const getFraudPosts = (page, limit, callback) => {
+  const offset = (page - 1) * limit;
 
-  const getFraudPosts = (page, callback) => {
-    const limit = 10;
-    const offset = (page - 1) * limit;
-  
-    const query = `
+  const query = `
       SELECT bof_idx, mem_id, bof_type, gd_name, damage_dt, damage_type, cnt_view, regdt
       FROM HM_BOARD_FRAUD
       WHERE deldt IS NULL
       ORDER BY regdt DESC
       LIMIT ? OFFSET ?;
-    `;
-  
-    connection.query(query, [limit, offset], (error, results) => {
+  `;
+
+  connection.query(query, [limit, offset], (error, results) => {
       if (error) return callback(error);
       callback(null, results);
-    });
-  };
+  });
+};
   
   const getFraudPostDetail = (bof_idx, callback) => {
     const query = `
@@ -440,6 +449,7 @@ const searchGeneralPostsByNick = (searchTerm, page, limit, callback) => {
     searchGeneralPostsByContent, 
     searchGeneralPostsByNick,   
     getFraudPosts,
+    getFraudPostsCount,
     getFraudPostDetail,           
     deleteMultipleFraudPosts,   
     searchFraudPostsByMemId,    
