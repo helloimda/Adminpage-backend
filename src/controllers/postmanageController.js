@@ -367,15 +367,17 @@ const getFraudPosts = (req, res) => {
   };
   
 
+  const deleteFraudPost = (req, res) => {
+    const postId = req.params.id; // URL 파라미터로 받은 게시글 ID
+    const deldt = new Date(); // 삭제 시점의 타임스탬프
   
-  const deleteMultipleFraudPosts = (req, res) => {
-    const postIds = req.body.postIds;
-    const deldt = new Date();
-  
-    postmanageService.deleteMultipleFraudPosts(postIds, deldt, (error, result) => {
+    postmanageService.deleteFraudPost(postId, deldt, (error, result) => {
       if (error) {
         console.error('사기 피해 게시글 삭제 실패:', error.message);
         return res.status(500).send('사기 피해 게시글 삭제 중 오류가 발생했습니다.');
+      }
+      if (result.affectedRows === 0) {
+        return res.status(404).send('해당 게시글을 찾을 수 없습니다.');
       }
       res.send('사기 피해 게시글이 성공적으로 삭제되었습니다.');
     });
@@ -424,7 +426,7 @@ const getFraudPosts = (req, res) => {
     searchGeneralPostsByNick,
     getFraudPosts,
     getFraudPostDetail,
-    deleteMultipleFraudPosts,
+    deleteFraudPost,
     searchFraudPostsByGoodName,
     searchFraudPostsByMemId,  
   };

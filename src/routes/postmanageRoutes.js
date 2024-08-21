@@ -21,13 +21,14 @@ router.get('/postmanage/general/search/subject/:id/:page', postmanageController.
 router.get('/postmanage/general/search/content/:id/:page', postmanageController.searchGeneralPostsByContent);
 router.get('/postmanage/general/search/nick/:id/:page', postmanageController.searchGeneralPostsByNick);
 
-//여기까지 완료 아래부터 수정해야함
+
 // 사기 피해 게시글 라우트
 router.get('/postmanage/fraud/:page', postmanageController.getFraudPosts);
 router.get('/postmanage/fraud/detail/:id', postmanageController.getFraudPostDetail);
-router.post('/postmanage/fraud/delete', postmanageController.deleteMultipleFraudPosts);
+//여기까지 완료 아래부터 수정해야함
+router.post('/postmanage/fraud/delete/:id', postmanageController.deleteFraudPost);
 
-router.get('/postmanage/fraud/search/memid', postmanageController.searchFraudPostsByMemId);
+router.get('/postmanage/fraud/search/nick/:id/:page', postmanageController.searchFraudPostsByMemId);
 router.get('/postmanage/fraud/search/goodname', postmanageController.searchFraudPostsByGoodName);
 
 module.exports = router;

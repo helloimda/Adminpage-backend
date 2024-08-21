@@ -381,14 +381,14 @@ const getFraudPosts = (page, limit, callback) => {
   
   
   
-  const deleteMultipleFraudPosts = (postIds, deldt, callback) => {
+  const deleteFraudPost = (postId, deldt, callback) => {
     const query = `
       UPDATE HM_BOARD_FRAUD
       SET deldt = ?
-      WHERE bof_idx IN (?) AND deldt IS NULL
+      WHERE bof_idx = ? AND deldt IS NULL
     `;
   
-    connection.query(query, [deldt, postIds], (error, results) => {
+    connection.query(query, [deldt, postId], (error, results) => {
       if (error) return callback(error);
       callback(null, results);
     });
@@ -411,6 +411,7 @@ const getFraudPosts = (page, limit, callback) => {
       callback(null, results);
     });
   };
+  
   const searchFraudPostsByMemId = (searchTerm, page, callback) => {
     const limit = 10;
     const offset = (page - 1) * limit;
@@ -451,7 +452,7 @@ const getFraudPosts = (page, limit, callback) => {
     getFraudPosts,
     getFraudPostsCount,
     getFraudPostDetail,           
-    deleteMultipleFraudPosts,   
+    deleteFraudPost,  
     searchFraudPostsByMemId,    
     searchFraudPostsByGoodName, 
   };
