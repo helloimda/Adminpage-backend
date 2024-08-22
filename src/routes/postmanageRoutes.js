@@ -25,7 +25,6 @@ router.get('/postmanage/general/search/nick/:id/:page', postmanageController.sea
 // 사기 피해 게시글 라우트
 router.get('/postmanage/fraud/:page', postmanageController.getFraudPosts);
 router.get('/postmanage/fraud/detail/:id', postmanageController.getFraudPostDetail);
-//여기까지 완료 아래부터 수정해야함
 router.post('/postmanage/fraud/delete/:id', postmanageController.deleteFraudPost);
 
 router.get('/postmanage/fraud/search/nick/:id/:page', postmanageController.searchFraudPostsByMemId);
