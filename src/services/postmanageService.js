@@ -163,7 +163,7 @@ const searchPostsByNick = (searchTerm, page, callback) => {
 
     const query = `
       UPDATE HM_BOARD_NOTICE
-      SET deldt = ?
+      SET deldt = ?, isdel = 'Y'
       WHERE bo_idx = ?
     `;
 
@@ -240,7 +240,7 @@ const getGeneralPostDetail = (bo_idx, callback) => {
   const deleteGeneralPost = (postId, deldt, callback) => {
     const query = `
       UPDATE HM_BOARD
-      SET deldt = ?
+      SET deldt = ?, isdel = 'Y'
       WHERE bo_idx = ? AND deldt IS NULL
     `;
   
@@ -403,7 +403,7 @@ const getFraudPosts = (page, limit, callback) => {
   const deleteFraudPost = (postId, deldt, callback) => {
     const query = `
       UPDATE HM_BOARD_FRAUD
-      SET deldt = ?
+      SET deldt = ?, isdel = 'Y'
       WHERE bof_idx = ? AND deldt IS NULL
     `;
   
