@@ -33,4 +33,6 @@ router.post('/postmanage/fraud/delete/:id', postmanageController.deleteFraudPost
 router.get('/postmanage/fraud/search/nick/:id/:page', postmanageController.searchFraudPostsByMemId);
 router.get('/postmanage/fraud/search/goodname/:id/:page', postmanageController.searchFraudPostsByGoodName);
 
+router.get('/postmanage/fraud/comment/:bof_idx', postmanageController.getFraudCommentsByPostId);
+
 module.exports = router;

@@ -451,6 +451,19 @@ const getCommentsByPostId = (req, res) => {
   });
 };
 
+const getFraudCommentsByPostId = (req, res) => {
+  const bof_idx = req.params.bof_idx;
+
+  postmanageService.getFraudCommentsByPostId(bof_idx, (error, comments) => {
+      if (error) {
+          console.error('사기 피해 게시글 댓글 불러오기 실패:', error.message);
+          return res.status(500).send('사기 피해 게시글 댓글을 불러오는 중 오류가 발생했습니다.');
+      }
+      res.json(comments);
+  });
+};
+
+
 
   module.exports = {
     getNotices,
@@ -472,5 +485,6 @@ const getCommentsByPostId = (req, res) => {
     searchFraudPostsByGoodName,
     searchFraudPostsByMemId,  
     getCommentsByPostId,
+    getFraudCommentsByPostId,
   };
   
