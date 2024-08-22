@@ -394,39 +394,58 @@ const getFraudPosts = (page, limit, callback) => {
     });
   };
   
-  const searchFraudPostsByGoodName = (searchTerm, page, callback) => {
-    const limit = 10;
+  const searchFraudPostsByGoodName = (searchTerm, page, limit, callback) => {
     const offset = (page - 1) * limit;
-  
+
     const query = `
-      SELECT bof_idx, bof_type, gd_name, damage_dt, damage_type, cnt_view, regdt 
-      FROM HM_BOARD_FRAUD 
-      WHERE gd_name LIKE ? AND deldt IS NULL
-      ORDER BY bof_idx DESC 
-      LIMIT ? OFFSET ?;
+        SELECT bof_idx, mem_id, bof_type, gd_name, damage_dt, damage_type, cnt_view, regdt
+        FROM HM_BOARD_FRAUD 
+        WHERE gd_name LIKE ? AND deldt IS NULL
+        ORDER BY bof_idx DESC 
+        LIMIT ? OFFSET ?;
     `;
-  
+
     connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
-      if (error) return callback(error);
-      callback(null, results);
+        if (error) return callback(error);
+        callback(null, results);
     });
-  };
+};
+
   
-  const searchFraudPostsByMemId = (searchTerm, page, callback) => {
-    const limit = 10;
+  const searchFraudPostsByMemId = (searchTerm, page, limit, callback) => {
     const offset = (page - 1) * limit;
-  
+
+    console.log(`Searching for mem_id like: ${searchTerm}`);
+    console.log(`Page: ${page}, Limit: ${limit}, Offset: ${offset}`);
+
     const query = `
-      SELECT bof_idx, bof_type, gd_name, damage_dt, damage_type, cnt_view, regdt 
+        SELECT bof_idx, mem_id, bof_type, gd_name, damage_dt, damage_type, cnt_view, regdt
+        FROM HM_BOARD_FRAUD 
+        WHERE mem_id LIKE ? AND deldt IS NULL
+        ORDER BY bof_idx DESC 
+        LIMIT ? OFFSET ?;
+    `;
+
+    connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+        if (error) {
+            console.error('Database query error:', error);
+            return callback(error);
+        }
+        console.log('Query results:', results);
+        callback(null, results);
+    });
+};
+
+  const getFraudPostsCountByMemId = (searchTerm, callback) => {
+    const query = `
+      SELECT COUNT(*) AS total
       FROM HM_BOARD_FRAUD 
-      WHERE mem_id LIKE ? AND deldt IS NULL
-      ORDER BY bof_idx DESC 
-      LIMIT ? OFFSET ?;
+      WHERE mem_id LIKE ? AND deldt IS NULL;
     `;
   
-    connection.query(query, [`%${searchTerm}%`, limit, offset], (error, results) => {
+    connection.query(query, [`%${searchTerm}%`], (error, results) => {
       if (error) return callback(error);
-      callback(null, results);
+      callback(null, results[0].total);
     });
   };
 
@@ -453,6 +472,7 @@ const getFraudPosts = (page, limit, callback) => {
     getFraudPostsCount,
     getFraudPostDetail,           
     deleteFraudPost,  
-    searchFraudPostsByMemId,    
+    searchFraudPostsByMemId,  
+    getFraudPostsCountByMemId,  
     searchFraudPostsByGoodName, 
   };

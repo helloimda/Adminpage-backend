@@ -29,6 +29,6 @@ router.get('/postmanage/fraud/detail/:id', postmanageController.getFraudPostDeta
 router.post('/postmanage/fraud/delete/:id', postmanageController.deleteFraudPost);
 
 router.get('/postmanage/fraud/search/nick/:id/:page', postmanageController.searchFraudPostsByMemId);
-router.get('/postmanage/fraud/search/goodname', postmanageController.searchFraudPostsByGoodName);
+router.get('/postmanage/fraud/search/goodname/:id/:page', postmanageController.searchFraudPostsByGoodName);
 
 module.exports = router;

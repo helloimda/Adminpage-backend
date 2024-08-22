@@ -385,30 +385,58 @@ const getFraudPosts = (req, res) => {
   
   
   const searchFraudPostsByGoodName = (req, res) => {
-    const searchTerm = req.query.q;
-    const page = parseInt(req.query.page) || 1;
-  
-    postmanageService.searchFraudPostsByGoodName(searchTerm, page, (error, results) => {
-      if (error) {
-        console.error('사기 피해 게시글 상품명 검색 실패:', error.message);
-        return res.status(500).send('사기 피해 게시글 상품명 검색 중 오류가 발생했습니다.');
-      }
-      res.json(results);
+    const searchTerm = req.params.id;  // req.query.q 대신 req.params.id 사용
+    const page = parseInt(req.params.page) || 1;
+    const limit = 10;
+
+    postmanageService.searchFraudPostsByGoodName(searchTerm, page, limit, (error, results) => {
+        if (error) {
+            console.error('사기 피해 게시글 상품명 검색 실패:', error.message);
+            return res.status(500).send('사기 피해 게시글 상품명 검색 중 오류가 발생했습니다.');
+        }
+
+        // 페이지네이션 관련 코드 추가
+        const totalPages = results.length === limit ? page + 1 : page;
+        const previousPage = page > 1 ? page - 1 : null;
+        const nextPage = results.length === limit ? page + 1 : null;
+
+        res.json({
+            data: results,
+            pagination: {
+                previousPage,
+                nextPage,
+                currentPage: page,
+                totalPages,
+            },
+        });
     });
-  };
+};
+
   
   const searchFraudPostsByMemId = (req, res) => {
-    const searchTerm = req.query.q;
-    const page = parseInt(req.query.page) || 1;
-  
-    postmanageService.searchFraudPostsByMemId(searchTerm, page, (error, results) => {
-      if (error) {
-        console.error('사기 피해 게시글 회원 ID 검색 실패:', error.message);
-        return res.status(500).send('사기 피해 게시글 회원 ID 검색 중 오류가 발생했습니다.');
-      }
-      res.json(results);
+    const searchTerm = req.params.id;  // req.query.q 대신 req.params.id 사용
+    const page = parseInt(req.params.page) || 1;
+    const limit = 10;
+
+    postmanageService.searchFraudPostsByMemId(searchTerm, page, limit, (error, results) => {
+        if (error) {
+            console.error('사기 피해 게시글 회원 ID 검색 실패:', error.message);
+            return res.status(500).send('사기 피해 게시글 회원 ID 검색 중 오류가 발생했습니다.');
+        }
+        
+        const totalPages = results.length === limit ? page + 1 : page;
+
+        res.json({
+            data: results,
+            pagination: {
+                previousPage: page > 1 ? page - 1 : null,
+                nextPage: results.length === limit ? page + 1 : null,
+                currentPage: page,
+                totalPages: totalPages,
+            },
+        });
     });
-  };
+};
 
   module.exports = {
     getNotices,
