@@ -1,21 +1,22 @@
 const connection = require('../config/db');
 
 const getMembers = (page, limit, callback) => {
-    const offset = (page - 1) * limit;
-  
-    const query = `
-      SELECT mem_idx, mem_id, mem_nick, mem_email, mem_hp,stopdt, stop_info, mem_profile_url
-      FROM HM_MEMBER
-      WHERE deldt IS NULL
-      ORDER BY mem_idx DESC
-      LIMIT ? OFFSET ?
-    `;
-  
-    connection.query(query, [limit, offset], (error, results) => {
-      if (error) return callback(error);
-      callback(null, results);
-    });
-  };
+  const offset = (page - 1) * limit;
+
+  const query = `
+    SELECT mem_idx, mem_id, mem_nick, mem_email, mem_hp, mem_profile_url, todaydt, isadmin, stopdt, stop_info
+    FROM HM_MEMBER
+    WHERE deldt IS NULL
+    ORDER BY mem_idx DESC
+    LIMIT ? OFFSET ?
+  `;
+
+  connection.query(query, [limit, offset], (error, results) => {
+    if (error) return callback(error);
+    callback(null, results);
+  });
+};
+
   
   const getMembersCount = (callback) => {
     const query = `
@@ -127,7 +128,8 @@ const getMembers = (page, limit, callback) => {
 
   const getUserDetailById = (memIdx, callback) => {
     const query = `
-        SELECT mem_idx, mem_id, mem_nick, mem_email, mem_hp, mem_profile_url, todaydt, isadmin
+        SELECT mem_idx, mem_id, mem_name, mem_nick, mem_email, mem_sex, mem_birth, mem_hp, mem_profile_url, 
+               content, todaydt, isstop, stop_info, stopdt, regdt
         FROM HM_MEMBER
         WHERE mem_idx = ?
     `;
@@ -139,6 +141,7 @@ const getMembers = (page, limit, callback) => {
         callback(null, results[0]);
     });
 };
+
 
 module.exports = {
   getUserDetailById,
