@@ -48,7 +48,7 @@ const getPostNoticeDetail = (bo_idx, callback) => {
       const imageQuery = `
         SELECT file_name, file_url
         FROM HM_BOARD_NOTICE_IMG
-        WHERE bo_idx = ?
+        WHERE bo_idx = ? AND deldt IS NULL
       `;
       
       connection.query(imageQuery, [bo_idx], (imgError, imgResults) => {
@@ -221,7 +221,7 @@ const getGeneralPostDetail = (bo_idx, callback) => {
     const imgQuery = `
       SELECT img_idx, file_name, file_url
       FROM HM_IMG
-      WHERE pidx = ?
+      WHERE pidx = ? AND deldt IS NULL
     `;
 
     connection.query(imgQuery, [bo_idx], (imgError, imgResults) => {
@@ -380,7 +380,7 @@ const getFraudPosts = (page, limit, callback) => {
         const imageQuery = `
           SELECT file_name, file_url
           FROM HM_BOARD_FRAUD_IMG
-          WHERE bof_idx = ?
+          WHERE bof_idx = ? AND deldt IS NULL
         `;
         
         connection.query(imageQuery, [bof_idx], (imgError, imgResults) => {
