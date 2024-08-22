@@ -206,17 +206,35 @@ const getGeneralPostsCount = (callback) => {
 };
 const getGeneralPostDetail = (bo_idx, callback) => {
   const query = `
-      SELECT bo_idx, mem_idx, mem_id, ca_idx, cd_subtag, brand_idx, cal_idx, subject, content, link, tags, newsdt, cnt_view, cnt_star, avg_star, cnt_good, cnt_bad, cnt_comment, cnt_bookmark, cnt_img, istemp, popdt, regdt
-      FROM HM_BOARD
-      WHERE bo_idx = ? AND deldt IS NULL
+    SELECT bo_idx, mem_idx, mem_id, ca_idx, cd_subtag, brand_idx, cal_idx, subject, content, link, tags, newsdt, cnt_view, cnt_star, avg_star, cnt_good, cnt_bad, cnt_comment, cnt_bookmark, cnt_img, istemp, popdt, regdt
+    FROM HM_BOARD
+    WHERE bo_idx = ? AND deldt IS NULL
   `;
 
   connection.query(query, [bo_idx], (error, results) => {
-      if (error) return callback(error);
-      if (results.length === 0) return callback(new Error('해당 게시글을 찾을 수 없습니다.'));
-      callback(null, results[0]);
+    if (error) return callback(error);
+    if (results.length === 0) return callback(new Error('해당 게시글을 찾을 수 없습니다.'));
+
+    const postDetail = results[0];
+
+    // 이미지를 가져오는 쿼리
+    const imgQuery = `
+      SELECT img_idx, file_name, file_url
+      FROM HM_IMG
+      WHERE pidx = ?
+    `;
+
+    connection.query(imgQuery, [bo_idx], (imgError, imgResults) => {
+      if (imgError) return callback(imgError);
+
+      // 이미지가 있는 경우 postDetail에 images 배열로 추가
+      postDetail.images = imgResults.length > 0 ? imgResults : [];
+
+      callback(null, postDetail);
+    });
   });
 };
+
 
   
   const deleteGeneralPost = (postId, deldt, callback) => {
