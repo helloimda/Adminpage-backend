@@ -114,7 +114,7 @@ const getMembers = (page, limit, callback) => {
   const deleteUser = (memIdx, callback) => {
     const query = `
       UPDATE HM_MEMBER
-      SET deldt = NOW()
+      SET deldt = NOW(), isdel = 'Y'
       WHERE mem_idx = ?
     `;
   
