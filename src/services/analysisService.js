@@ -373,7 +373,20 @@ const getPostCounts = (type, callback) => {
   });
 };
 
+const getPostsByCategory = (date, callback) => {
+  const query = `
+      SELECT ca_idx, cd_subtag, COUNT(*) as count
+      FROM HM_BOARD
+      WHERE DATE(regdt) = ?
+      GROUP BY ca_idx, cd_subtag
+      ORDER BY ca_idx, cd_subtag;
+  `;
 
+  connection.query(query, [date], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+  });
+};
 
 
 module.exports = {
@@ -382,4 +395,5 @@ module.exports = {
   getTotalMembers,
   getGenderAndAgeStats,  
   getPostCounts,
+  getPostsByCategory,
 };

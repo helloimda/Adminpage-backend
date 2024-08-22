@@ -58,10 +58,24 @@ const getPostAnalysis = (req, res) => {
   });
 };
 
+const getPostsByCategory = (req, res) => {
+  const date = req.params.date;  // :date를 통해 받은 날짜 파라미터
+
+  analysisService.getPostsByCategory(date, (error, results) => {
+      if (error) {
+          console.error('게시글 카테고리별 조회 실패:', error.message);
+          return res.status(500).send('게시글 카테고리별 조회 중 오류가 발생했습니다.');
+      }
+      res.json(results);
+  });
+};
+
+
 module.exports = {
   getVisitors, 
   getRegistrations,
   getTotalMembers,
   getGenderAndAgeStats,  
   getPostAnalysis,
+  getPostsByCategory,
 };

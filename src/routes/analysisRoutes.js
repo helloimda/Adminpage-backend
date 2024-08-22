@@ -13,8 +13,12 @@ router.get('/analysis/registrations/:type', analysisController.getRegistrations)
 router.get('/analysis/total-members/:type', analysisController.getTotalMembers);
 
 // 성별 및 연령대 집계 라우트
-router.get('/analysis/gender-age-stats', analysisController.getGenderAndAgeStats);  // 새로운 라우트 추가
+router.get('/analysis/gender-age-stats', analysisController.getGenderAndAgeStats);
 
+// 포스트 분석 라우트
 router.get('/analysis/posts/:type', analysisController.getPostAnalysis);
+
+// 포스트 카테고리별 집계 라우트
+router.get('/analysis/postscategory/:date', analysisController.getPostsByCategory);
 
 module.exports = router;

@@ -179,7 +179,7 @@ const getGeneralPosts = (page, limit, callback) => {
   const offset = (page - 1) * limit;
 
   const query = `
-      SELECT bo_idx, mem_id, subject, cnt_view, cnt_star, cnt_good, cnt_bed, cnt_comment, regdt
+      SELECT bo_idx, mem_id, subject, cnt_view, cnt_star, cnt_good, cnt_bad, cnt_comment, regdt
       FROM HM_BOARD 
       WHERE deldt IS NULL
       ORDER BY regdt DESC 
