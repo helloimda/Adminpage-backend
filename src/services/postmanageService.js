@@ -494,6 +494,33 @@ const getFraudCommentsByPostId = (bof_idx, callback) => {
   });
 };
 
+const deleteComment = (cmt_idx, deldt, callback) => {
+  const query = `
+      UPDATE HM_BOARD_COMMENT
+      SET isdel = 'Y', deldt = ?
+      WHERE cmt_idx = ? AND isdel = 'N'
+  `;
+
+  connection.query(query, [deldt, cmt_idx], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+  });
+};
+
+const deleteFraudComment = (bofc_idx, deldt, callback) => {
+  const query = `
+      UPDATE HM_BOARD_FRAUD_COMMENT
+      SET isdel = 'Y', deldt = ?
+      WHERE bofc_idx = ? AND isdel = 'N'
+  `;
+
+  connection.query(query, [deldt, bofc_idx], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+  });
+};
+
+
 
   module.exports = {
     getNotices,
@@ -523,4 +550,6 @@ const getFraudCommentsByPostId = (bof_idx, callback) => {
     searchFraudPostsByGoodName, 
     getCommentsByPostId,
     getFraudCommentsByPostId,
+    deleteComment,
+    deleteFraudComment,
   };

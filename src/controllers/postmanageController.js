@@ -463,7 +463,37 @@ const getFraudCommentsByPostId = (req, res) => {
   });
 };
 
+const deleteComment = (req, res) => {
+  const cmt_idx = req.params.cmt_idx;
+  const deldt = new Date(); // 현재 시간으로 타임스탬프 설정
 
+  postmanageService.deleteComment(cmt_idx, deldt, (error, result) => {
+      if (error) {
+          console.error('댓글 삭제 실패:', error.message);
+          return res.status(500).send('댓글 삭제 중 오류가 발생했습니다.');
+      }
+      if (result.affectedRows === 0) {
+          return res.status(404).send('해당 댓글을 찾을 수 없습니다.');
+      }
+      res.send('댓글이 성공적으로 삭제되었습니다.');
+  });
+};
+
+const deleteFraudComment = (req, res) => {
+  const bofc_idx = req.params.bofc_idx;
+  const deldt = new Date(); // 현재 시간으로 타임스탬프 설정
+
+  postmanageService.deleteFraudComment(bofc_idx, deldt, (error, result) => {
+      if (error) {
+          console.error('사기 피해 댓글 삭제 실패:', error.message);
+          return res.status(500).send('사기 피해 댓글 삭제 중 오류가 발생했습니다.');
+      }
+      if (result.affectedRows === 0) {
+          return res.status(404).send('해당 댓글을 찾을 수 없습니다.');
+      }
+      res.send('사기 피해 댓글이 성공적으로 삭제되었습니다.');
+  });
+};
 
   module.exports = {
     getNotices,
@@ -486,5 +516,7 @@ const getFraudCommentsByPostId = (req, res) => {
     searchFraudPostsByMemId,  
     getCommentsByPostId,
     getFraudCommentsByPostId,
+    deleteComment,
+    deleteFraudComment,
   };
   
