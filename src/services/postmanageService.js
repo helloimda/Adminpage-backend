@@ -204,19 +204,20 @@ const getGeneralPostsCount = (callback) => {
       callback(null, totalPosts);
   });
 };
-  const getGeneralPostDetail = (bo_idx, callback) => {
-    const query = `
-      SELECT bo_idx, mem_id, subject, content, cnt_view, regdt
+const getGeneralPostDetail = (bo_idx, callback) => {
+  const query = `
+      SELECT bo_idx, mem_idx, mem_id, ca_idx, cd_subtag, brand_idx, cal_idx, subject, content, link, tags, newsdt, cnt_view, cnt_star, avg_star, cnt_good, cnt_bad, cnt_comment, cnt_bookmark, cnt_img, istemp, popdt, regdt
       FROM HM_BOARD
       WHERE bo_idx = ? AND deldt IS NULL
-    `;
-  
-    connection.query(query, [bo_idx], (error, results) => {
+  `;
+
+  connection.query(query, [bo_idx], (error, results) => {
       if (error) return callback(error);
       if (results.length === 0) return callback(new Error('해당 게시글을 찾을 수 없습니다.'));
       callback(null, results[0]);
-    });
-  };
+  });
+};
+
   
   const deleteGeneralPost = (postId, deldt, callback) => {
     const query = `
