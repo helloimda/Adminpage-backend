@@ -21,6 +21,9 @@ router.get('/postmanage/general/search/subject/:id/:page', postmanageController.
 router.get('/postmanage/general/search/content/:id/:page', postmanageController.searchGeneralPostsByContent);
 router.get('/postmanage/general/search/nick/:id/:page', postmanageController.searchGeneralPostsByNick);
 
+router.get('/postmanage/general/comment/:id', postmanageController.getCommentsByPostId);
+
+
 
 // 사기 피해 게시글 라우트
 router.get('/postmanage/fraud/:page', postmanageController.getFraudPosts);

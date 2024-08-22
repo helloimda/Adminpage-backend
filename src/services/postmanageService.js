@@ -467,6 +467,20 @@ const getFraudPosts = (page, limit, callback) => {
       callback(null, results[0].total);
     });
   };
+  const getCommentsByPostId = (bo_idx, callback) => {
+    const query = `
+        SELECT cmt_idx, bo_idx, pcmt_idx, mem_idx, mem_id, content, isbest, isAnonymous, cnt_star, cnt_good, cnt_bad, onum, regdt
+        FROM HM_BOARD_COMMENT
+        WHERE bo_idx = ? AND deldt IS NULL
+        ORDER BY regdt ASC
+    `;
+
+    connection.query(query, [bo_idx], (error, results) => {
+        if (error) return callback(error);
+        callback(null, results);
+    });
+};
+
 
   module.exports = {
     getNotices,
@@ -494,4 +508,5 @@ const getFraudPosts = (page, limit, callback) => {
     searchFraudPostsByMemId,  
     getFraudPostsCountByMemId,  
     searchFraudPostsByGoodName, 
+    getCommentsByPostId,
   };

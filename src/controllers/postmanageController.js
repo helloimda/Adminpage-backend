@@ -438,6 +438,20 @@ const getFraudPosts = (req, res) => {
     });
 };
 
+
+const getCommentsByPostId = (req, res) => {
+  const bo_idx = req.params.id;
+
+  postmanageService.getCommentsByPostId(bo_idx, (error, comments) => {
+      if (error) {
+          console.error('댓글 불러오기 실패:', error.message);
+          return res.status(500).send('댓글을 불러오는 중 오류가 발생했습니다.');
+      }
+      res.json(comments);
+  });
+};
+
+
   module.exports = {
     getNotices,
     getPostNoticeDetail,
@@ -457,5 +471,6 @@ const getFraudPosts = (req, res) => {
     deleteFraudPost,
     searchFraudPostsByGoodName,
     searchFraudPostsByMemId,  
+    getCommentsByPostId,
   };
   
