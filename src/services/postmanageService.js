@@ -672,6 +672,117 @@ const getFraudCommentsCountByPost = (bof_idx, callback) => {
   });
 };
 
+const searchCommentsByNickname = (mem_id, limit, offset, callback) => {
+  const query = `
+    SELECT cmt_idx, bo_idx, pcmt_idx, mem_idx, mem_id, ca_idx, brand_idx, content, isbest, isAnonymous, cnt_star, cnt_good, cnt_bad, istemp, onum, regdt
+    FROM HM_BOARD_COMMENT
+    WHERE mem_id LIKE ? AND deldt IS NULL
+    ORDER BY regdt DESC
+    LIMIT ? OFFSET ?;
+  `;
+
+  connection.query(query, [`%${mem_id}%`, limit, offset], (error, results) => {
+    if (error) return callback(error);
+    callback(null, results);
+  });
+};
+
+const getCommentsCountByNickname = (mem_id, callback) => {
+  const query = `
+    SELECT COUNT(*) AS totalComments
+    FROM HM_BOARD_COMMENT
+    WHERE mem_id LIKE ? AND deldt IS NULL;
+  `;
+
+  connection.query(query, [`%${mem_id}%`], (error, results) => {
+    if (error) return callback(error);
+    callback(null, results[0].totalComments);
+  });
+};
+
+const searchCommentsByContent = (content, limit, offset, callback) => {
+  const query = `
+    SELECT cmt_idx, bo_idx, pcmt_idx, mem_idx, mem_id, ca_idx, brand_idx, content, isbest, isAnonymous, cnt_star, cnt_good, cnt_bad, istemp, onum, regdt
+    FROM HM_BOARD_COMMENT
+    WHERE content LIKE ? AND deldt IS NULL
+    ORDER BY regdt DESC
+    LIMIT ? OFFSET ?;
+  `;
+
+  connection.query(query, [`%${content}%`, limit, offset], (error, results) => {
+    if (error) return callback(error);
+    callback(null, results);
+  });
+};
+
+const getCommentsCountByContent = (content, callback) => {
+  const query = `
+    SELECT COUNT(*) AS totalComments
+    FROM HM_BOARD_COMMENT
+    WHERE content LIKE ? AND deldt IS NULL;
+  `;
+
+  connection.query(query, [`%${content}%`], (error, results) => {
+    if (error) return callback(error);
+    callback(null, results[0].totalComments);
+  });
+};
+
+const searchFraudCommentsByNickname = (mem_id, limit, offset, callback) => {
+  const query = `
+    SELECT bofc_idx, bof_idx, pbofc_idx, mem_idx, mem_id, content, isAnonymous, regdt
+    FROM HM_BOARD_FRAUD_COMMENT
+    WHERE mem_id LIKE ? AND deldt IS NULL
+    ORDER BY regdt DESC
+    LIMIT ? OFFSET ?;
+  `;
+
+  connection.query(query, [`%${mem_id}%`, limit, offset], (error, results) => {
+    if (error) return callback(error);
+    callback(null, results);
+  });
+};
+
+const getFraudCommentsCountByNickname = (mem_id, callback) => {
+  const query = `
+    SELECT COUNT(*) AS totalComments
+    FROM HM_BOARD_FRAUD_COMMENT
+    WHERE mem_id LIKE ? AND deldt IS NULL;
+  `;
+
+  connection.query(query, [`%${mem_id}%`], (error, results) => {
+    if (error) return callback(error);
+    callback(null, results[0].totalComments);
+  });
+};
+
+const searchFraudCommentsByContent = (content, limit, offset, callback) => {
+  const query = `
+    SELECT bofc_idx, bof_idx, pbofc_idx, mem_idx, mem_id, content, isAnonymous, regdt
+    FROM HM_BOARD_FRAUD_COMMENT
+    WHERE content LIKE ? AND deldt IS NULL
+    ORDER BY regdt DESC
+    LIMIT ? OFFSET ?;
+  `;
+
+  connection.query(query, [`%${content}%`, limit, offset], (error, results) => {
+    if (error) return callback(error);
+    callback(null, results);
+  });
+};
+
+const getFraudCommentsCountByContent = (content, callback) => {
+  const query = `
+    SELECT COUNT(*) AS total
+    FROM HM_BOARD_FRAUD_COMMENT
+    WHERE content LIKE ? AND deldt IS NULL;
+  `;
+
+  connection.query(query, [`%${content}%`], (error, results) => {
+    if (error) return callback(error);
+    callback(null, results[0].total);
+  });
+};
 
   module.exports = {
     getNotices,
@@ -713,4 +824,12 @@ const getFraudCommentsCountByPost = (bof_idx, callback) => {
     getFraudCommentsCount,
     getFraudCommentsByPost,
     getFraudCommentsCountByPost,
+    searchCommentsByNickname,
+    getCommentsCountByNickname,
+    searchCommentsByContent,
+    getCommentsCountByContent,
+    searchFraudCommentsByNickname,
+    getFraudCommentsCountByNickname,
+    searchFraudCommentsByContent,
+    getFraudCommentsCountByContent,
   };

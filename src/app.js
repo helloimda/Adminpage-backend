@@ -2,6 +2,7 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
+const path = require('path');
 const adminCheckMiddleware = require("./middleware/adminCheckMiddleware");
 const userbanRoutes = require("./routes/userbanRoutes");
 const analysisRoutes = require("./routes/analysisRoutes");
@@ -13,6 +14,7 @@ app.use(
     origin: "*", // 또는 '*'
   })
 );
+
 
 app.use(adminCheckMiddleware);
 

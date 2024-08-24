@@ -24,9 +24,12 @@ router.get('/postmanage/general/search/content/:id/:page', postmanageController.
 router.get('/postmanage/general/search/nick/:id/:page', postmanageController.searchGeneralPostsByNick);
 router.get('/postmanage/general/comment/:id', postmanageController.getCommentsByPostId);
 router.get('/postmanage/general/comment/delete/:cmt_idx', postmanageController.deleteComment);
-
 router.get('/postmanage/general/comment/list/:page', postmanageController.getCommentList);
 router.get('/postmanage/general/comment/detail/:bo_idx/:page', postmanageController.getCommentDetailByPost);
+
+router.get('/postmanage/general/comment/search/nickname/:mem_id/:page', postmanageController.searchCommentsByNickname);
+router.get('/postmanage/general/comment/search/content/:content/:page', postmanageController.searchCommentsByContent);
+
 
 // 사기 피해 게시글 라우트
 router.get('/postmanage/fraud/:page', postmanageController.getFraudPosts);
@@ -36,9 +39,9 @@ router.get('/postmanage/fraud/search/nick/:id/:page', postmanageController.searc
 router.get('/postmanage/fraud/search/goodname/:id/:page', postmanageController.searchFraudPostsByGoodName);
 router.get('/postmanage/fraud/comment/:bof_idx', postmanageController.getFraudCommentsByPostId);
 router.get('/postmanage/fraud/comment/delete/:bofc_idx', postmanageController.deleteFraudComment);
-
 router.get('/postmanage/fraud/comment/list/:page', postmanageController.getFraudComments);
 router.get('/postmanage/fraud/comment/detail/:bof_idx/:page', postmanageController.getFraudCommentsByPost);
 
-
+router.get('/postmanage/fraud/comment/nickname/:mem_id/:page', postmanageController.searchFraudCommentsByNickname);
+router.get('/postmanage/fraud/comment/content/:content/:page', postmanageController.searchFraudCommentsByContent);
 module.exports = router;

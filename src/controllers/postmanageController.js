@@ -664,6 +664,150 @@ const getFraudCommentsByPost = (req, res) => {
   });
 };
 
+const searchCommentsByNickname = (req, res) => {
+  const mem_id = req.params.mem_id;
+  const page = parseInt(req.params.page) || 1;
+  const limit = 10;  // 한 페이지당 10개의 결과를 보여줌
+  const offset = (page - 1) * limit;
+
+  postmanageService.searchCommentsByNickname(mem_id, limit, offset, (error, results) => {
+    if (error) {
+      console.error('댓글 검색 실패:', error.message);
+      return res.status(500).send('댓글 검색 중 오류가 발생했습니다.');
+    }
+
+    // 전체 댓글 수를 조회하여 페이지네이션 정보를 추가
+    postmanageService.getCommentsCountByNickname(mem_id, (error, totalComments) => {
+      if (error) {
+        console.error('댓글 수 조회 실패:', error.message);
+        return res.status(500).send('댓글 수 조회 중 오류가 발생했습니다.');
+      }
+
+      const totalPages = Math.ceil(totalComments / limit);
+      const previousPage = page > 1 ? page - 1 : null;
+      const nextPage = page < totalPages ? page + 1 : null;
+
+      res.json({
+        data: results,
+        pagination: {
+          previousPage,
+          nextPage,
+          currentPage: page,
+          totalPages,
+        },
+      });
+    });
+  });
+};
+
+const searchCommentsByContent = (req, res) => {
+  const content = req.params.content;
+  const page = parseInt(req.params.page) || 1;
+  const limit = 10;  // 한 페이지당 10개의 결과를 보여줌
+  const offset = (page - 1) * limit;
+
+  postmanageService.searchCommentsByContent(content, limit, offset, (error, results) => {
+    if (error) {
+      console.error('댓글 내용 검색 실패:', error.message);
+      return res.status(500).send('댓글 내용 검색 중 오류가 발생했습니다.');
+    }
+
+    // 전체 댓글 수를 조회하여 페이지네이션 정보를 추가
+    postmanageService.getCommentsCountByContent(content, (error, totalComments) => {
+      if (error) {
+        console.error('댓글 수 조회 실패:', error.message);
+        return res.status(500).send('댓글 수 조회 중 오류가 발생했습니다.');
+      }
+
+      const totalPages = Math.ceil(totalComments / limit);
+      const previousPage = page > 1 ? page - 1 : null;
+      const nextPage = page < totalPages ? page + 1 : null;
+
+      res.json({
+        data: results,
+        pagination: {
+          previousPage,
+          nextPage,
+          currentPage: page,
+          totalPages,
+        },
+      });
+    });
+  });
+};
+
+const searchFraudCommentsByNickname = (req, res) => {
+  const mem_id = req.params.mem_id;
+  const page = parseInt(req.params.page) || 1;
+  const limit = 10;  // 한 페이지당 10개의 결과를 보여줌
+  const offset = (page - 1) * limit;
+
+  postmanageService.searchFraudCommentsByNickname(mem_id, limit, offset, (error, results) => {
+    if (error) {
+      console.error('사기 피해 댓글 검색 실패:', error.message);
+      return res.status(500).send('사기 피해 댓글 검색 중 오류가 발생했습니다.');
+    }
+
+    // 전체 댓글 수를 조회하여 페이지네이션 정보를 추가
+    postmanageService.getFraudCommentsCountByNickname(mem_id, (error, totalComments) => {
+      if (error) {
+        console.error('사기 피해 댓글 수 조회 실패:', error.message);
+        return res.status(500).send('사기 피해 댓글 수를 조회하는 중 오류가 발생했습니다.');
+      }
+
+      const totalPages = Math.ceil(totalComments / limit);
+      const previousPage = page > 1 ? page - 1 : null;
+      const nextPage = page < totalPages ? page + 1 : null;
+
+      res.json({
+        data: results,
+        pagination: {
+          previousPage,
+          nextPage,
+          currentPage: page,
+          totalPages,
+        },
+      });
+    });
+  });
+};
+
+const searchFraudCommentsByContent = (req, res) => {
+  const content = req.params.content;
+  const page = parseInt(req.params.page) || 1;
+  const limit = 10;  // 한 페이지당 10개의 결과를 보여줌
+  const offset = (page - 1) * limit;
+
+  postmanageService.searchFraudCommentsByContent(content, limit, offset, (error, results) => {
+    if (error) {
+      console.error('사기 피해 댓글 검색 실패:', error.message);
+      return res.status(500).send('사기 피해 댓글 검색 중 오류가 발생했습니다.');
+    }
+
+    // 전체 댓글 수를 조회하여 페이지네이션 정보를 추가
+    postmanageService.getFraudCommentsCountByContent(content, (error, totalComments) => {
+      if (error) {
+        console.error('사기 피해 댓글 수 조회 실패:', error.message);
+        return res.status(500).send('사기 피해 댓글 수를 조회하는 중 오류가 발생했습니다.');
+      }
+
+      const totalPages = Math.ceil(totalComments / limit);
+      const previousPage = page > 1 ? page - 1 : null;
+      const nextPage = page < totalPages ? page + 1 : null;
+
+      res.json({
+        data: results,
+        pagination: {
+          previousPage,
+          nextPage,
+          currentPage: page,
+          totalPages,
+        },
+      });
+    });
+  });
+};
+
 
   module.exports = {
     getNotices,
@@ -694,5 +838,9 @@ const getFraudCommentsByPost = (req, res) => {
     getCommentDetailByPost,
     getFraudComments,
     getFraudCommentsByPost,
+    searchCommentsByNickname,
+    searchCommentsByContent,
+    searchFraudCommentsByNickname,
+    searchFraudCommentsByContent,
   };
   
