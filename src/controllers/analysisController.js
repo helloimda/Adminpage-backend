@@ -69,6 +69,15 @@ const getPostsByCategory = (req, res) => {
       res.json(results);
   });
 };
+const getAllPostsByCategory = (req, res) => {
+  analysisService.getAllPostsByCategory((error, results) => {
+      if (error) {
+          console.error('카테고리별 게시글 카운트 불러오기 실패:', error.message);
+          return res.status(500).send('카테고리별 게시글 카운트 불러오는 중 오류가 발생했습니다.');
+      }
+      res.json(results);
+  });
+};
 
 
 module.exports = {
@@ -78,4 +87,5 @@ module.exports = {
   getGenderAndAgeStats,  
   getPostAnalysis,
   getPostsByCategory,
+  getAllPostsByCategory,
 };

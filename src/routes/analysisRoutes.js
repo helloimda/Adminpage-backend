@@ -21,4 +21,6 @@ router.get('/analysis/posts/:type', analysisController.getPostAnalysis);
 // 포스트 카테고리별 집계 라우트
 router.get('/analysis/postscategory/:date', analysisController.getPostsByCategory);
 
+router.get('/analysis/postscategoryall', analysisController.getAllPostsByCategory);
+
 module.exports = router;
