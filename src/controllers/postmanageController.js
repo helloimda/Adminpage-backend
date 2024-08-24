@@ -80,7 +80,7 @@ const updatePostNoticeDetail = (req, res) => {
             const nextPage = page < totalPages ? page + 1 : null;
 
             res.json({
-                results: results,
+                data: results,
                 pagination: {
                     previousPage: previousPage,
                     nextPage: nextPage,
@@ -113,7 +113,7 @@ const searchPostsByContent = (req, res) => {
       };
 
       res.json({
-          results: results,
+          data: results,
           pagination: pagination
       });
   });
