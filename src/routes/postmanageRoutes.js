@@ -12,6 +12,8 @@ router.get('/postmanage/notice/search/subject/:name/:page', postmanageController
 router.get('/postmanage/notice/search/content/:name/:page', postmanageController.searchPostsByContent);
 router.get('/postmanage/notice/search/nick/:name/:page', postmanageController.searchPostsByNick);
 
+router.post('/postmanage/notice/post', postmanageController.createNoticePost);
+
 // 일반 게시글 라우트
 router.get('/postmanage/general/:page', postmanageController.getGeneralPosts); 
 router.get('/postmanage/general/detail/:id', postmanageController.getGeneralPostDetail);

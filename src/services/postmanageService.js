@@ -520,6 +520,31 @@ const deleteFraudComment = (bofc_idx, deldt, callback) => {
   });
 };
 
+const createNoticePost = (mem_idx, mem_id, subject, content, tags, istemp, regdt, callback) => {
+  // bo_idx의 최대값을 가져와서 +1한 값을 사용
+  const queryGetMaxIdx = 'SELECT MAX(bo_idx) AS maxBoIdx FROM HM_BOARD_NOTICE';
+
+  connection.query(queryGetMaxIdx, (error, results) => {
+      if (error) return callback(error);
+
+      const newBoIdx = results[0].maxBoIdx ? results[0].maxBoIdx + 1 : 1;
+
+      const queryInsert = `
+          INSERT INTO HM_BOARD_NOTICE (bo_idx, mem_idx, mem_id, subject, content, tags, istemp, regdt, cnt_view, isdel)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 'N')
+      `;
+
+      const values = [newBoIdx, mem_idx, mem_id, subject, content, tags, istemp, regdt];
+
+      connection.query(queryInsert, values, (error, results) => {
+          if (error) return callback(error);
+          callback(null, results);
+      });
+  });
+};
+
+
+
 
 
   module.exports = {
@@ -552,4 +577,5 @@ const deleteFraudComment = (bofc_idx, deldt, callback) => {
     getFraudCommentsByPostId,
     deleteComment,
     deleteFraudComment,
+    createNoticePost,
   };

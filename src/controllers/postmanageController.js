@@ -495,6 +495,23 @@ const deleteFraudComment = (req, res) => {
   });
 };
 
+
+const createNoticePost = (req, res) => {
+    const { mem_idx, mem_id, subject, content, tags, istemp } = req.body;
+
+    // 현재 시간을 regdt에 사용하기 위해
+    const regdt = new Date();
+
+    // 서비스를 통해 게시글을 생성
+    postmanageService.createNoticePost(mem_idx, mem_id, subject, content, tags, istemp, regdt, (error, result) => {
+        if (error) {
+            console.error('공지사항 생성 실패:', error.message);
+            return res.status(500).send('공지사항 생성 중 오류가 발생했습니다.');
+        }
+        res.status(201).json({ message: '공지사항이 성공적으로 생성되었습니다.', bo_idx: result.insertId });
+    });
+};
+
   module.exports = {
     getNotices,
     getPostNoticeDetail,
@@ -518,5 +535,6 @@ const deleteFraudComment = (req, res) => {
     getFraudCommentsByPostId,
     deleteComment,
     deleteFraudComment,
+    createNoticePost,
   };
   
