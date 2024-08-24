@@ -561,7 +561,7 @@ const deleteNoticeImage = (bo_idx, img_idx, deldt, callback) => {
 const getCommentsWithPagination = (limit, offset, callback) => {
   const query = `
       SELECT cmt_idx, bo_idx, pcmt_idx, mem_idx, mem_id, ca_idx, brand_idx, content, isbest, 
-             isAnonymous, cnt_star, cnt_good, cnt_bad, istemp, onum, isdel, regdt, moddt, deldt
+             isAnonymous, cnt_star, cnt_good, cnt_bad, istemp, onum, regdt
       FROM HM_BOARD_COMMENT
       WHERE deldt IS NULL
       ORDER BY regdt DESC
@@ -590,7 +590,7 @@ const getCommentCount = (callback) => {
 const getCommentsByPostWithPagination = (bo_idx, limit, offset, callback) => {
   const query = `
       SELECT cmt_idx, bo_idx, pcmt_idx, mem_idx, mem_id, ca_idx, brand_idx, content, isbest, 
-             isAnonymous, cnt_star, cnt_good, cnt_bad, istemp, onum, isdel, regdt, moddt, deldt
+             isAnonymous, cnt_star, cnt_good, cnt_bad, istemp, onum, regdt
       FROM HM_BOARD_COMMENT
       WHERE bo_idx = ? AND deldt IS NULL
       ORDER BY regdt DESC
@@ -611,6 +611,62 @@ const getCommentCountByPost = (bo_idx, callback) => {
   `;
 
   connection.query(query, [bo_idx], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results[0].totalComments);
+  });
+};
+
+const getFraudComments = (offset, limit, callback) => {
+  const query = `
+      SELECT bofc_idx, bof_idx, pbofc_idx, mem_idx, mem_id, content, isAnonymous, regdt
+      FROM HM_BOARD_FRAUD_COMMENT
+      WHERE deldt IS NULL
+      ORDER BY bofc_idx DESC
+      LIMIT ? OFFSET ?;
+  `;
+
+  connection.query(query, [limit, offset], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+  });
+};
+
+const getFraudCommentsCount = (callback) => {
+  const query = `
+      SELECT COUNT(*) AS totalComments
+      FROM HM_BOARD_FRAUD_COMMENT
+      WHERE deldt IS NULL;
+  `;
+
+  connection.query(query, (error, results) => {
+      if (error) return callback(error);
+      callback(null, results[0].totalComments);
+  });
+};
+
+const getFraudCommentsByPost = (bof_idx, offset, limit, callback) => {
+  const query = `
+      SELECT bofc_idx, bof_idx, pbofc_idx, mem_idx, mem_id, content, isAnonymous, regdt
+      FROM HM_BOARD_FRAUD_COMMENT
+      WHERE bof_idx = ? AND deldt IS NULL
+      ORDER BY bofc_idx DESC
+      LIMIT ? OFFSET ?;
+  `;
+
+  connection.query(query, [bof_idx, limit, offset], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+  });
+};
+
+const getFraudCommentsCountByPost = (bof_idx, callback) => {
+  const query = `
+      SELECT COUNT(*) AS totalComments
+      FROM HM_BOARD_FRAUD_COMMENT
+      WHERE bof_idx = ? AND deldt IS NULL;
+  `;
+
+  connection.query(query, [bof_idx], (error, results) => {
       if (error) return callback(error);
       callback(null, results[0].totalComments);
   });
@@ -653,4 +709,8 @@ const getCommentCountByPost = (bo_idx, callback) => {
     getCommentCount,
     getCommentsByPostWithPagination,
     getCommentCountByPost,
+    getFraudComments,
+    getFraudCommentsCount,
+    getFraudCommentsByPost,
+    getFraudCommentsCountByPost,
   };
