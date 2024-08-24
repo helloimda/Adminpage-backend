@@ -140,7 +140,7 @@ const searchPostsByNick = (req, res) => {
     };
 
     res.json({
-        results: results,
+        data: results,
         pagination: pagination,
     });
   });
