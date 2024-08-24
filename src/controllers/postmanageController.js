@@ -511,6 +511,19 @@ const createNoticePost = (req, res) => {
         res.status(201).json({ message: '공지사항이 성공적으로 생성되었습니다.', bo_idx: result.insertId });
     });
 };
+const deleteNoticeImage = (req, res) => {
+  const { bo_idx, img_idx } = req.params;
+  const deldt = new Date();  // 현재 타임스탬프
+
+  postmanageService.deleteNoticeImage(bo_idx, img_idx, deldt, (error, result) => {
+      if (error) {
+          console.error('공지사항 이미지 삭제 실패:', error.message);
+          return res.status(500).send('공지사항 이미지 삭제 중 오류가 발생했습니다.');
+      }
+      res.send('공지사항 이미지가 성공적으로 삭제되었습니다.');
+  });
+};
+
 
   module.exports = {
     getNotices,
@@ -536,5 +549,6 @@ const createNoticePost = (req, res) => {
     deleteComment,
     deleteFraudComment,
     createNoticePost,
+    deleteNoticeImage,
   };
   

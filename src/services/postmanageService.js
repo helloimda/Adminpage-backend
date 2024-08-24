@@ -543,6 +543,20 @@ const createNoticePost = (mem_idx, mem_id, subject, content, tags, istemp, regdt
   });
 };
 
+const deleteNoticeImage = (bo_idx, img_idx, deldt, callback) => {
+  const query = `
+      UPDATE HM_BOARD_NOTICE_IMG
+      SET isdel = 'Y', deldt = ?
+      WHERE bo_idx = ? AND img_idx = ? AND isdel = 'N'
+  `;
+
+  connection.query(query, [deldt, bo_idx, img_idx], (error, results) => {
+      if (error) return callback(error);
+      if (results.affectedRows === 0) return callback(new Error('이미지를 찾을 수 없거나 이미 삭제되었습니다.'));
+      callback(null, results);
+  });
+};
+
 
 
 
@@ -578,4 +592,5 @@ const createNoticePost = (mem_idx, mem_id, subject, content, tags, istemp, regdt
     deleteComment,
     deleteFraudComment,
     createNoticePost,
+    deleteNoticeImage,
   };
