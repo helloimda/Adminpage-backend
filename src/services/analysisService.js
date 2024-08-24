@@ -375,11 +375,22 @@ const getPostCounts = (type, callback) => {
 
 const getPostsByCategory = (date, callback) => {
   const query = `
-      SELECT ca_idx, cd_subtag, COUNT(*) as count
-      FROM HM_BOARD
-      WHERE DATE(regdt) = ?
-      GROUP BY ca_idx, cd_subtag
-      ORDER BY ca_idx, cd_subtag;
+      SELECT 
+        b.ca_idx, 
+        COALESCE(c.ca_subject, 'null') AS cd_tag, 
+        COUNT(*) as count
+      FROM 
+        HM_BOARD b
+      LEFT JOIN 
+        HM_CATEGORY c 
+      ON 
+        b.ca_idx = c.ca_idx
+      WHERE 
+        DATE(b.regdt) = ?
+      GROUP BY 
+        b.ca_idx, c.ca_subject
+      ORDER BY 
+        b.ca_idx ASC, c.ca_subject ASC;
   `;
 
   connection.query(query, [date], (error, results) => {
@@ -388,13 +399,25 @@ const getPostsByCategory = (date, callback) => {
   });
 };
 
+
 const getAllPostsByCategory = (callback) => {
   const query = `
-      SELECT ca_idx, cd_subtag, COUNT(*) as total_posts
-      FROM HM_BOARD
-      WHERE deldt IS NULL
-      GROUP BY ca_idx, cd_subtag
-      ORDER BY ca_idx ASC, cd_subtag ASC;
+      SELECT 
+        b.ca_idx, 
+        COALESCE(c.ca_subject, 'null') AS cd_tag, 
+        COUNT(*) as total_posts
+      FROM 
+        HM_BOARD b
+      LEFT JOIN 
+        HM_CATEGORY c 
+      ON 
+        b.ca_idx = c.ca_idx
+      WHERE 
+        b.deldt IS NULL
+      GROUP BY 
+        b.ca_idx, c.ca_subject
+      ORDER BY 
+        b.ca_idx ASC, c.ca_subject ASC;
   `;
 
   connection.query(query, (error, results) => {
@@ -402,6 +425,8 @@ const getAllPostsByCategory = (callback) => {
       callback(null, results);
   });
 };
+
+
 
 
 module.exports = {

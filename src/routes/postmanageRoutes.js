@@ -14,6 +14,7 @@ router.get('/postmanage/notice/search/nick/:name/:page', postmanageController.se
 router.post('/postmanage/notice/post', postmanageController.createNoticePost);
 router.post('/postmanage/notice/imgdelete/:bo_idx/:img_idx', postmanageController.deleteNoticeImage);
 
+
 // 일반 게시글 라우트
 router.get('/postmanage/general/:page', postmanageController.getGeneralPosts); 
 router.get('/postmanage/general/detail/:id', postmanageController.getGeneralPostDetail);
