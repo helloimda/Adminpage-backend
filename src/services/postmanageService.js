@@ -558,7 +558,63 @@ const deleteNoticeImage = (bo_idx, img_idx, deldt, callback) => {
 };
 
 
+const getCommentsWithPagination = (limit, offset, callback) => {
+  const query = `
+      SELECT cmt_idx, bo_idx, pcmt_idx, mem_idx, mem_id, ca_idx, brand_idx, content, isbest, 
+             isAnonymous, cnt_star, cnt_good, cnt_bad, istemp, onum, isdel, regdt, moddt, deldt
+      FROM HM_BOARD_COMMENT
+      WHERE deldt IS NULL
+      ORDER BY regdt DESC
+      LIMIT ? OFFSET ?;
+  `;
 
+  connection.query(query, [limit, offset], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+  });
+};
+
+const getCommentCount = (callback) => {
+  const query = `
+      SELECT COUNT(*) AS totalComments
+      FROM HM_BOARD_COMMENT
+      WHERE deldt IS NULL;
+  `;
+
+  connection.query(query, (error, results) => {
+      if (error) return callback(error);
+      callback(null, results[0].totalComments);
+  });
+};
+
+const getCommentsByPostWithPagination = (bo_idx, limit, offset, callback) => {
+  const query = `
+      SELECT cmt_idx, bo_idx, pcmt_idx, mem_idx, mem_id, ca_idx, brand_idx, content, isbest, 
+             isAnonymous, cnt_star, cnt_good, cnt_bad, istemp, onum, isdel, regdt, moddt, deldt
+      FROM HM_BOARD_COMMENT
+      WHERE bo_idx = ? AND deldt IS NULL
+      ORDER BY regdt DESC
+      LIMIT ? OFFSET ?;
+  `;
+
+  connection.query(query, [bo_idx, limit, offset], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results);
+  });
+};
+
+const getCommentCountByPost = (bo_idx, callback) => {
+  const query = `
+      SELECT COUNT(*) AS totalComments
+      FROM HM_BOARD_COMMENT
+      WHERE bo_idx = ? AND deldt IS NULL;
+  `;
+
+  connection.query(query, [bo_idx], (error, results) => {
+      if (error) return callback(error);
+      callback(null, results[0].totalComments);
+  });
+};
 
 
   module.exports = {
@@ -593,4 +649,8 @@ const deleteNoticeImage = (bo_idx, img_idx, deldt, callback) => {
     deleteFraudComment,
     createNoticePost,
     deleteNoticeImage,
+    getCommentsWithPagination,
+    getCommentCount,
+    getCommentsByPostWithPagination,
+    getCommentCountByPost,
   };

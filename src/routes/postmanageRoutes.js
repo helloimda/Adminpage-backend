@@ -27,7 +27,8 @@ router.get('/postmanage/general/search/nick/:id/:page', postmanageController.sea
 router.get('/postmanage/general/comment/:id', postmanageController.getCommentsByPostId);
 router.get('/postmanage/general/comment/delete/:cmt_idx', postmanageController.deleteComment);
 
-
+router.get('/postmanage/general/comment/list/:page', postmanageController.getCommentList);
+router.get('/postmanage/general/comment/detail/:bo_idx/:page', postmanageController.getCommentDetailByPost);
 
 // 사기 피해 게시글 라우트
 router.get('/postmanage/fraud/:page', postmanageController.getFraudPosts);

@@ -524,6 +524,75 @@ const deleteNoticeImage = (req, res) => {
   });
 };
 
+const getCommentList = (req, res) => {
+  const page = parseInt(req.params.page) || 1;
+  const limit = 10; // 한 페이지에 표시할 댓글 수
+  const offset = (page - 1) * limit;
+
+  postmanageService.getCommentsWithPagination(limit, offset, (error, results) => {
+      if (error) {
+          console.error('댓글 리스트 가져오기 실패:', error.message);
+          return res.status(500).send('댓글 리스트를 가져오는 중 오류가 발생했습니다.');
+      }
+      
+      postmanageService.getCommentCount((error, totalComments) => {
+          if (error) {
+              console.error('총 댓글 수 가져오기 실패:', error.message);
+              return res.status(500).send('총 댓글 수를 가져오는 중 오류가 발생했습니다.');
+          }
+
+          const totalPages = Math.ceil(totalComments / limit);
+          const previousPage = page > 1 ? page - 1 : null;
+          const nextPage = page < totalPages ? page + 1 : null;
+
+          res.json({
+              data: results,
+              pagination: {
+                  previousPage,
+                  nextPage,
+                  currentPage: page,
+                  totalPages,
+              },
+          });
+      });
+  });
+};
+
+const getCommentDetailByPost = (req, res) => {
+  const bo_idx = parseInt(req.params.bo_idx);
+  const page = parseInt(req.params.page) || 1;
+  const limit = 10; // 한 페이지에 표시할 댓글 수
+  const offset = (page - 1) * limit;
+
+  postmanageService.getCommentsByPostWithPagination(bo_idx, limit, offset, (error, results) => {
+      if (error) {
+          console.error('댓글 리스트 가져오기 실패:', error.message);
+          return res.status(500).send('댓글 리스트를 가져오는 중 오류가 발생했습니다.');
+      }
+
+      postmanageService.getCommentCountByPost(bo_idx, (error, totalComments) => {
+          if (error) {
+              console.error('총 댓글 수 가져오기 실패:', error.message);
+              return res.status(500).send('총 댓글 수를 가져오는 중 오류가 발생했습니다.');
+          }
+
+          const totalPages = Math.ceil(totalComments / limit);
+          const previousPage = page > 1 ? page - 1 : null;
+          const nextPage = page < totalPages ? page + 1 : null;
+
+          res.json({
+              data: results,
+              pagination: {
+                  previousPage,
+                  nextPage,
+                  currentPage: page,
+                  totalPages,
+              },
+          });
+      });
+  });
+};
+
 
   module.exports = {
     getNotices,
@@ -550,5 +619,7 @@ const deleteNoticeImage = (req, res) => {
     deleteFraudComment,
     createNoticePost,
     deleteNoticeImage,
+    getCommentList,
+    getCommentDetailByPost,
   };
   
