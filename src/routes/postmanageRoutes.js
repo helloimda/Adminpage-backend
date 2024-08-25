@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const postmanageController = require('../controllers/postmanageController');
-
+const extractUserFromToken = require('../middleware/extractUserFromToken');
 // 공지사항 리스트를 가져오는 라우트
 router.get('/postmanage/notice/:page', postmanageController.getNotices);
 router.get('/postmanage/notice/detail/:id', postmanageController.getPostNoticeDetail);
@@ -14,8 +14,9 @@ router.get('/postmanage/notice/search/nick/:name/:page', postmanageController.se
 router.post('/postmanage/notice/post', postmanageController.createNoticePost);
 router.post('/postmanage/notice/imgdelete/:bo_idx/:img_idx', postmanageController.deleteNoticeImage);
 
+router.get('/postmanage/notice/postuser', extractUserFromToken, postmanageController.returnUserInfo);
 
-// 일반 게시글 라우트
+//일반 게시글
 router.get('/postmanage/general/:page', postmanageController.getGeneralPosts); 
 router.get('/postmanage/general/detail/:id', postmanageController.getGeneralPostDetail);
 router.post('/postmanage/general/delete/:id', postmanageController.deleteGeneralPost);

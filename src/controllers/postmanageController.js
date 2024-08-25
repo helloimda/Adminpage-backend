@@ -511,6 +511,19 @@ const createNoticePost = (req, res) => {
         res.status(201).json({ message: '공지사항이 성공적으로 생성되었습니다.', bo_idx: result.insertId });
     });
 };
+
+const returnUserInfo = (req, res) => {
+  if (req.user) {
+      console.log('컨트롤러에서 사용자 정보:', req.user);  // 사용자 정보 로깅
+      res.json({ mem_id: req.user.mem_id });
+  } else {
+      res.status(404).json({ message: '사용자 정보를 찾을 수 없습니다.' });
+  }
+};
+
+
+
+
 const deleteNoticeImage = (req, res) => {
   const { bo_idx, img_idx } = req.params;
   const deldt = new Date();  // 현재 타임스탬프
@@ -842,5 +855,6 @@ const searchFraudCommentsByContent = (req, res) => {
     searchCommentsByContent,
     searchFraudCommentsByNickname,
     searchFraudCommentsByContent,
+    returnUserInfo,
   };
   
