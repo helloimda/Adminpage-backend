@@ -10,6 +10,9 @@ const connection = require("./config/db"); // DB 연결 설정 불러오기
 const userRoutes = require('./routes/userRoutes');
 const postmanageRoutes = require('./routes/postmanageRoutes');
 const memberQnaRoutes = require('./routes/memberqna');
+const limitedSaleRoutes = require('./routes/limitedsalesRoutes');
+
+
 app.use(
   cors({
     origin: "*", // 또는 '*'
@@ -25,4 +28,5 @@ app.use('/', userRoutes);
 app.use("/", userbanRoutes);
 app.use("/", analysisRoutes);
 app.use("/", memberQnaRoutes);
+app.use('/', limitedSaleRoutes);
 module.exports = app;
