@@ -72,7 +72,35 @@ const getLimitedSalesByCategory = (req, res) => {
     });
 };
 
+const getBrandListByBtype = (req, res) => {
+    limitedSalesService.getBrandListByBtype((error, results) => {
+        if (error) {
+            console.error('브랜드 리스트 불러오기 실패:', error.message);
+            return res.status(500).send('브랜드 리스트를 불러오는 중 오류가 발생했습니다.');
+        }
+
+        res.json({
+            data: results,
+        });
+    });
+};
+
+const deleteLimitedSale = (req, res) => {
+    const gd_idx = req.params.gd_idx;
+
+    limitedSalesService.deleteLimitedSale(gd_idx, (error, results) => {
+        if (error) {
+            console.error('게시글 삭제 실패:', error.message);
+            return res.status(500).send('게시글을 삭제하는 중 오류가 발생했습니다.');
+        }
+
+        res.json({ message: '게시글이 성공적으로 삭제되었습니다.' });
+    });
+};
+
 module.exports = {
     getLimitedSales,
     getLimitedSalesByCategory,
+    getBrandListByBtype,
+    deleteLimitedSale,
 };

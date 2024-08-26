@@ -134,9 +134,63 @@ const getLimitedSalesCountByCategory = (brand, type, callback) => {
     });
 };
 
+const getBrandListByBtype = (callback) => {
+    const query = `
+        SELECT 
+            btype, 
+            brand_name_ko, 
+            brand_img
+        FROM 
+            HM_BRAND
+        WHERE 
+            deldt IS NULL
+        ORDER BY 
+            btype;
+    `;
+
+    connection.query(query, (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+
+        const groupedResults = results.reduce((acc, curr) => {
+            const { btype, brand_name_ko, brand_img } = curr;
+            if (!acc[btype]) {
+                acc[btype] = [];
+            }
+            acc[btype].push({ brand_name: brand_name_ko, brand_img });
+            return acc;
+        }, {});
+
+        callback(null, groupedResults);
+    });
+};
+
+const deleteLimitedSale = (gd_idx, callback) => {
+    const query = `
+        UPDATE HM_GOODS
+        SET isdel = 'Y', deldt = NOW()
+        WHERE gd_idx = ? AND deldt IS NULL;
+    `;
+
+    connection.query(query, [gd_idx], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+
+        if (results.affectedRows === 0) {
+            return callback(new Error('존재하지 않거나 이미 삭제된 게시글입니다.'), null);
+        }
+
+        callback(null, results);
+    });
+};
+
 module.exports = {
     getLimitedSalesList,
     getLimitedSalesCount,
     getLimitedSalesByCategory,
     getLimitedSalesCountByCategory,
+    getBrandListByBtype,
+    deleteLimitedSale,
 };
