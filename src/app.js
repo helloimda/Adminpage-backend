@@ -6,12 +6,12 @@ const path = require('path');
 const adminCheckMiddleware = require("./middleware/adminCheckMiddleware");
 const userbanRoutes = require("./routes/userbanRoutes");
 const analysisRoutes = require("./routes/analysisRoutes");
-const connection = require("./config/db"); // DB 연결 설정 불러오기
+const connection = require("./config/db");
 const userRoutes = require('./routes/userRoutes');
 const postmanageRoutes = require('./routes/postmanageRoutes');
 const memberQnaRoutes = require('./routes/memberqna');
 const limitedSaleRoutes = require('./routes/limitedsalesRoutes');
-
+const reportManageRoutes = require('./routes/reportManageRoutes');
 
 app.use(
   cors({
@@ -23,6 +23,7 @@ app.use(
 app.use(adminCheckMiddleware);
 
 app.use(express.json()); // JSON 요청 파싱
+app.use('/', reportManageRoutes);
 app.use('/', postmanageRoutes);
 app.use('/', userRoutes);
 app.use("/", userbanRoutes);
