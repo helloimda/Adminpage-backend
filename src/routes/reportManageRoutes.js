@@ -6,5 +6,6 @@ const reportManageController = require('../controllers/reportManageController');
 router.get('/reports/board/:page', reportManageController.getReports);
 router.get('/reports/boardcount', reportManageController.getReportedPostsCount);
 
-
+router.get('/reports/member/:page', reportManageController.getMemberReports);
+router.get('/reports/membercount', reportManageController.getMemberReportsCount);
 module.exports = router;
