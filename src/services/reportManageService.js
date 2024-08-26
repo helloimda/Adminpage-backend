@@ -112,47 +112,31 @@ const getMemberReportsCount = (callback) => {
 const countMemberReports = (callback) => {
     const query = `
         SELECT 
-            m.mem_idx, m.mem_id, COUNT(d.content) AS report_count
+            d.gd_idx,
+            d.content,
+            COUNT(*) AS report_count,
+            COUNT(*) OVER (PARTITION BY d.gd_idx) AS total_report_count
         FROM 
-            HM_MEMBER m
+            HM_MEMBER_GOODS_DECLARE d
         JOIN 
-            HM_BOARD_DECLARE d ON m.mem_idx = d.mem_idx
+            HM_MEMBER m ON d.mem_idx = m.mem_idx
         WHERE 
             m.deldt IS NULL
         GROUP BY 
-            m.mem_idx, m.mem_id
+            d.gd_idx, d.content
         ORDER BY 
-            report_count DESC;
+            d.gd_idx, report_count DESC;
     `;
 
     connection.query(query, (error, results) => {
         if (error) {
             return callback(error, null);
         }
-
-        const totalReportsQuery = `
-            SELECT 
-                COUNT(d.content) AS total_reports
-            FROM 
-                HM_MEMBER m
-            JOIN 
-                HM_BOARD_DECLARE d ON m.mem_idx = d.mem_idx
-            WHERE 
-                m.deldt IS NULL;
-        `;
-
-        connection.query(totalReportsQuery, (totalError, totalResults) => {
-            if (totalError) {
-                return callback(totalError, null);
-            }
-
-            callback(null, {
-                reportsByUser: results,
-                totalReports: totalResults[0].total_reports,
-            });
-        });
+        callback(null, results);
     });
 };
+
+
 
 module.exports = {
     getReportsList,

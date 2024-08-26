@@ -80,11 +80,11 @@ const getMemberReports = (req, res) => {
     });
 };
 
-const getMemberReportsCount = (req, res) => {
-    reportManageService.getMemberReportsCount((error, results) => {
+const countMemberReports = (req, res) => {
+    reportManageService.countMemberReports((error, results) => {
         if (error) {
-            console.error('멤버 신고 게시글 수 조회 실패:', error.message);
-            return res.status(500).send('멤버 신고 게시글 수를 조회하는 중 오류가 발생했습니다.');
+            console.error('멤버 신고 카운트 조회 실패:', error.message);
+            return res.status(500).json({ message: '멤버 신고 카운트를 조회하는 중 오류가 발생했습니다.' });
         }
 
         res.json(results);
@@ -95,5 +95,5 @@ module.exports = {
     getReports,
     getReportedPostsCount,
     getMemberReports,
-    getMemberReportsCount,
+    countMemberReports,
 };
