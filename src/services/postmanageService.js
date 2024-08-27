@@ -1,6 +1,10 @@
-const { s3Client, connection } = require('../config/db');  // connection 객체 가져오기
+const connection = require('../config/db');
+const { s3Client } = require('../config/s3'); 
 const { Upload } = require('@aws-sdk/lib-storage');
-const path = require('path'); // path 모듈 추가
+const path = require('path');
+
+
+
 
 const getNotices = (page, limit, callback) => {
   const offset = (page - 1) * limit;
@@ -804,7 +808,6 @@ const uploadImageToS3 = async (originalname, mimetype, buffer) => {
   });
 
   const data = await upload.done();
-
   return `https://${process.env.BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
 };
 

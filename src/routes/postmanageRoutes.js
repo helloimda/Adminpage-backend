@@ -2,10 +2,9 @@ const express = require('express');
 const router = express.Router();
 const postmanageController = require('../controllers/postmanageController');
 const extractUserFromToken = require('../middleware/extractUserFromToken');
+
 const multer = require('multer');
-const multerS3 = require('multer-s3');
 const path = require('path');
-const { s3 } = require('../config/db');
 
 const upload = multer({
     storage: multer.memoryStorage(), // 메모리 저장소 사용
@@ -41,7 +40,6 @@ router.get('/postmanage/general/comment/detail/:bo_idx/:page', postmanageControl
 router.get('/postmanage/general/comment/search/nickname/:mem_id/:page', postmanageController.searchCommentsByNickname);
 router.get('/postmanage/general/comment/search/content/:content/:page', postmanageController.searchCommentsByContent);
 
-
 // 사기 피해 게시글 라우트
 router.get('/postmanage/fraud/:page', postmanageController.getFraudPosts);
 router.get('/postmanage/fraud/detail/:id', postmanageController.getFraudPostDetail);
@@ -55,4 +53,5 @@ router.get('/postmanage/fraud/comment/detail/:bof_idx/:page', postmanageControll
 
 router.get('/postmanage/fraud/comment/nickname/:mem_id/:page', postmanageController.searchFraudCommentsByNickname);
 router.get('/postmanage/fraud/comment/content/:content/:page', postmanageController.searchFraudCommentsByContent);
+
 module.exports = router;
