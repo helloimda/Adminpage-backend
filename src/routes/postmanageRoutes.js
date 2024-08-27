@@ -2,6 +2,16 @@ const express = require('express');
 const router = express.Router();
 const postmanageController = require('../controllers/postmanageController');
 const extractUserFromToken = require('../middleware/extractUserFromToken');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
+const path = require('path');
+const { s3 } = require('../config/db');
+
+const upload = multer({
+    storage: multer.memoryStorage(), // 메모리 저장소 사용
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB 제한
+});
+
 // 공지사항 리스트를 가져오는 라우트
 router.get('/postmanage/notice/:page', postmanageController.getNotices);
 router.get('/postmanage/notice/detail/:id', postmanageController.getPostNoticeDetail);
@@ -10,11 +20,11 @@ router.post('/postmanage/notice/delete/:id', postmanageController.deletePost);
 router.get('/postmanage/notice/search/subject/:name/:page', postmanageController.searchPostsBySubject);
 router.get('/postmanage/notice/search/content/:name/:page', postmanageController.searchPostsByContent);
 router.get('/postmanage/notice/search/nick/:name/:page', postmanageController.searchPostsByNick);
-
 router.post('/postmanage/notice/post', postmanageController.createNoticePost);
 router.post('/postmanage/notice/imgdelete/:bo_idx/:img_idx', postmanageController.deleteNoticeImage);
-
 router.get('/postmanage/notice/post/user', extractUserFromToken, postmanageController.returnUserInfo);
+
+router.post('/postmanage/notice/imgadd/:bo_idx', upload.single('image'), postmanageController.addNoticeImage);
 
 //일반 게시글
 router.get('/postmanage/general/:page', postmanageController.getGeneralPosts); 

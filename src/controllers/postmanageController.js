@@ -1,4 +1,31 @@
 const postmanageService = require('../services/postmanageService');
+const { connection } = require('../config/db');
+
+
+const addNoticeImage = async (req, res) => {
+  try {
+      const bo_idx = req.params.bo_idx;
+      const { originalname, mimetype, size, buffer } = req.file;
+
+      // S3 업로드 서비스 호출
+      const location = await postmanageService.uploadImageToS3(originalname, mimetype, buffer);
+
+      // DB에 이미지 정보 저장 서비스 호출
+      postmanageService.addNoticeImage(bo_idx, originalname, mimetype, size, location, (error, result) => {
+          if (error) {
+              console.error('DB에 이미지 정보 저장 실패:', error.message);
+              return res.status(500).send('DB에 이미지 정보 저장 중 오류가 발생했습니다.');
+          }
+          res.status(201).json({ message: '이미지가 성공적으로 업로드되었습니다.', file_url: location });
+      });
+  } catch (error) {
+      console.error('S3 이미지 업로드 실패:', error.message);
+      return res.status(500).send('이미지 업로드 중 오류가 발생했습니다.');
+  }
+};
+
+
+
 
 const getNotices = (req, res) => {
   const page = parseInt(req.params.page) || 1; // URL에서 페이지 번호를 가져옵니다.
@@ -823,6 +850,7 @@ const searchFraudCommentsByContent = (req, res) => {
 
 
   module.exports = {
+    addNoticeImage,
     getNotices,
     getPostNoticeDetail,
     updatePostNoticeDetail,

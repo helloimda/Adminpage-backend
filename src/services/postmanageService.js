@@ -1,4 +1,6 @@
-const connection = require('../config/db');
+const { s3Client, connection } = require('../config/db');  // connection 객체 가져오기
+const { Upload } = require('@aws-sdk/lib-storage');
+const path = require('path'); // path 모듈 추가
 
 const getNotices = (page, limit, callback) => {
   const offset = (page - 1) * limit;
@@ -784,6 +786,60 @@ const getFraudCommentsCountByContent = (content, callback) => {
   });
 };
 
+const uploadImageToS3 = async (originalname, mimetype, buffer) => {
+  const ext = path.extname(originalname);
+  const s3Key = `hdumdu/${Date.now().toString()}${ext}`;
+
+  const uploadParams = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: s3Key,
+      Body: buffer,
+      ContentType: mimetype,
+      ACL: 'public-read',
+  };
+
+  const upload = new Upload({
+      client: s3Client,
+      params: uploadParams,
+  });
+
+  const data = await upload.done();
+
+  return `https://${process.env.BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
+};
+
+const addNoticeImage = (bo_idx, file_name, mime_type, file_size, file_url, callback) => {
+  // 먼저 bo_idx에 해당하는 이미지들의 최대 order_num 값을 조회합니다.
+  const getMaxOrderNumQuery = `
+      SELECT IFNULL(MAX(order_num), 0) as maxOrderNum 
+      FROM HM_BOARD_NOTICE_IMG 
+      WHERE bo_idx = ? AND isdel = 'N';
+  `;
+
+  connection.query(getMaxOrderNumQuery, [bo_idx], (error, results) => {
+      if (error) {
+          return callback(error, null);
+      }
+
+      const maxOrderNum = results[0].maxOrderNum;
+      const newOrderNum = maxOrderNum + 1; // 새 이미지의 order_num을 설정
+
+      // 이제 새로운 이미지를 추가합니다.
+      const insertImageQuery = `
+          INSERT INTO HM_BOARD_NOTICE_IMG 
+          (bo_idx, file_name, mime_type, file_size, file_url, order_num, isdel, regdt) 
+          VALUES (?, ?, ?, ?, ?, ?, 'N', NOW());
+      `;
+
+      connection.query(insertImageQuery, [bo_idx, file_name, mime_type, file_size, file_url, newOrderNum], (error, insertResults) => {
+          if (error) {
+              return callback(error, null);
+          }
+          callback(null, insertResults);
+      });
+  });
+};
+
   module.exports = {
     getNotices,
     getNoticesCount,
@@ -832,4 +888,6 @@ const getFraudCommentsCountByContent = (content, callback) => {
     getFraudCommentsCountByNickname,
     searchFraudCommentsByContent,
     getFraudCommentsCountByContent,
+    addNoticeImage,
+    uploadImageToS3,
   };
