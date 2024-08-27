@@ -3,12 +3,7 @@ const connection = require('../config/db');
 const getLimitedSalesList = (limit, offset, callback) => {
     const query = `
         SELECT 
-            gd_idx, cg_idx, ca_idx, brand_idx, brand_str, btype, mem_idx, mem_id, 
-            gd_name, gd_num, gd_status, gd_view, isware, buy_price, price, 
-            buy_place, buy_year, buy_month, condition_goods, condition_state, 
-            isbox, iswarranty, isetc, component, content, isoffer, isexchange, 
-            proposal, istemp, cnt_view, cnt_star, avg_star, cnt_good, cnt_bad, 
-            cnt_bookmark, cnt_comment, cnt_img, cnt_pull, cnt_noteGroup, gddt, regdt 
+            gd_idx, btype, gd_name, gd_num, cnt_star, gd_status, price, regdt 
         FROM 
             HM_GOODS 
         WHERE 
@@ -320,6 +315,45 @@ const getGoodsCountByName = (gd_name, callback) => {
     });
 };
 
+const getGoodsDetail = (gd_idx, callback) => {
+    const query = `
+        SELECT gd_idx, cg_idx, ca_idx, brand_idx, brand_str, btype, mem_idx, mem_id, gd_name, gd_num, gd_status, gd_view, 
+               isware, buy_price, price, buy_place, buy_year, buy_month, condition_goods, condition_state, isbox, 
+               iswarranty, isetc, component, content, isoffer, isexchange, proposal, istemp, cnt_view, cnt_star, 
+               avg_star, cnt_good, cnt_bad, cnt_bookmark, cnt_comment, cnt_img, cnt_pull, cnt_noteGroup, gddt, regdt
+        FROM HM_GOODS
+        WHERE gd_idx = ? AND isdel = 'N';
+    `;
+
+    connection.query(query, [gd_idx], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+
+        if (results.length === 0) {
+            return callback(new Error('해당 상품을 찾을 수 없습니다.'), null);
+        }
+
+        const goodsDetail = results[0];
+
+        // 이미지를 불러오는 쿼리
+        const imgQuery = `
+            SELECT file_name, file_url
+            FROM HM_IMG
+            WHERE pidx = ? AND ttype = 'GOODS' AND deldt IS NULL;
+        `;
+
+        connection.query(imgQuery, [gd_idx], (imgError, imgResults) => {
+            if (imgError) {
+                return callback(imgError, null);
+            }
+
+            goodsDetail.images = imgResults; // 상품 정보에 이미지 추가
+            callback(null, goodsDetail);
+        });
+    });
+};
+
 
 module.exports = {
     getLimitedSalesList,
@@ -332,4 +366,5 @@ module.exports = {
     searchGoodsByName,
     searchGoodsByMember,
     getGoodsCountByMember,
+    getGoodsDetail,
 };

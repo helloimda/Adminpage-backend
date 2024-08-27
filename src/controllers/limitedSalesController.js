@@ -170,6 +170,19 @@ const searchGoodsByMember = (req, res) => {
     });
 };
 
+const getGoodsDetail = (req, res) => {
+    const gd_idx = req.params.gd_idx;
+
+    limitedSalesService.getGoodsDetail(gd_idx, (error, goods) => {
+        if (error) {
+            console.error('상품 정보 조회 중 오류 발생:', error);
+            return res.status(500).json({ error: '상품 정보를 불러오는 중 오류가 발생했습니다.' });
+        }
+
+        res.json(goods);
+    });
+};
+
 
 module.exports = {
     getLimitedSales,
@@ -178,4 +191,5 @@ module.exports = {
     deleteLimitedSale,
     searchGoodsByName,
     searchGoodsByMember,
+    getGoodsDetail,
 };

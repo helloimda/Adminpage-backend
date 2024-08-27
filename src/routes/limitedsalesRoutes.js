@@ -7,10 +7,10 @@ router.get('/limitedsales/list/:page', limitedSalesController.getLimitedSales);
 router.get('/limitedsales/category/:brand/:type/:page', limitedSalesController.getLimitedSalesByCategory);
 router.get('/limitedsales/listcategory', limitedSalesController.getBrandListByBtype);
 router.post('/limitedsales/post/delete/:gd_idx', limitedSalesController.deleteLimitedSale);
-
 router.post('/limitedsales/post/search/goods/:gd_name/:page', limitedSalesController.searchGoodsByName);
 router.post('/limitedsales/post/search/member/:mem_id/:page', limitedSalesController.searchGoodsByMember);
 
+router.post('/limitedsales/post/detail/:gd_idx', limitedSalesController.getGoodsDetail);
 
 
 module.exports = router;
