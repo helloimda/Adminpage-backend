@@ -14,7 +14,7 @@ router.get('/postmanage/notice/search/nick/:name/:page', postmanageController.se
 router.post('/postmanage/notice/post', postmanageController.createNoticePost);
 router.post('/postmanage/notice/imgdelete/:bo_idx/:img_idx', postmanageController.deleteNoticeImage);
 
-router.get('/postmanage/notice/postuser', extractUserFromToken, postmanageController.returnUserInfo);
+router.get('/postmanage/notice/post/user', extractUserFromToken, postmanageController.returnUserInfo);
 
 //일반 게시글
 router.get('/postmanage/general/:page', postmanageController.getGeneralPosts); 
