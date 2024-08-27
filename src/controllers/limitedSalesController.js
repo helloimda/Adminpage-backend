@@ -98,9 +98,84 @@ const deleteLimitedSale = (req, res) => {
     });
 };
 
+const searchGoodsByName = (req, res) => {
+    const gd_name = req.params.gd_name;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;  // 한 페이지당 10개의 결과를 보여줌
+    const offset = (page - 1) * limit;
+
+    limitedSalesService.searchGoodsByName(gd_name, limit, offset, (error, results) => {
+        if (error) {
+            console.error('상품 검색 실패:', error.message);
+            return res.status(500).send('상품 검색 중 오류가 발생했습니다.');
+        }
+
+        // 전체 아이템 수를 조회하여 페이지네이션 정보를 추가
+        limitedSalesService.getGoodsCountByName(gd_name, (error, totalItems) => {
+            if (error) {
+                console.error('상품 수 조회 실패:', error.message);
+                return res.status(500).send('상품 수를 조회하는 중 오류가 발생했습니다.');
+            }
+
+            const totalPages = Math.ceil(totalItems / limit);
+            const previousPage = page > 1 ? page - 1 : null;
+            const nextPage = page < totalPages ? page + 1 : null;
+
+            res.json({
+                data: results,
+                pagination: {
+                    previousPage,
+                    nextPage,
+                    currentPage: page,
+                    totalPages,
+                },
+            });
+        });
+    });
+};
+
+const searchGoodsByMember = (req, res) => {
+    const mem_id = req.params.mem_id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;  // 한 페이지당 10개의 결과를 보여줌
+    const offset = (page - 1) * limit;
+
+    limitedSalesService.searchGoodsByMember(mem_id, limit, offset, (error, results) => {
+        if (error) {
+            console.error('회원별 상품 검색 실패:', error.message);
+            return res.status(500).send('회원별 상품 검색 중 오류가 발생했습니다.');
+        }
+
+        // 전체 아이템 수를 조회하여 페이지네이션 정보를 추가
+        limitedSalesService.getGoodsCountByMember(mem_id, (error, totalItems) => {
+            if (error) {
+                console.error('회원별 상품 수 조회 실패:', error.message);
+                return res.status(500).send('회원별 상품 수를 조회하는 중 오류가 발생했습니다.');
+            }
+
+            const totalPages = Math.ceil(totalItems / limit);
+            const previousPage = page > 1 ? page - 1 : null;
+            const nextPage = page < totalPages ? page + 1 : null;
+
+            res.json({
+                data: results,
+                pagination: {
+                    previousPage,
+                    nextPage,
+                    currentPage: page,
+                    totalPages,
+                },
+            });
+        });
+    });
+};
+
+
 module.exports = {
     getLimitedSales,
     getLimitedSalesByCategory,
     getBrandListByBtype,
     deleteLimitedSale,
+    searchGoodsByName,
+    searchGoodsByMember,
 };

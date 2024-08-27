@@ -186,6 +186,141 @@ const deleteLimitedSale = (gd_idx, callback) => {
     });
 };
 
+const searchGoodsByName = (gd_name, limit, offset, callback) => {
+    const query = `
+        SELECT 
+            gd_idx, cg_idx, ca_idx, brand_idx, brand_str, btype, mem_idx, mem_id, 
+            gd_name, gd_num, gd_status, gd_view, isware, buy_price, price, 
+            buy_place, buy_year, buy_month, condition_goods, condition_state, 
+            isbox, iswarranty, isetc, component, content, isoffer, isexchange, 
+            proposal, istemp, cnt_view, cnt_star, avg_star, cnt_good, cnt_bad, 
+            cnt_bookmark, cnt_comment, cnt_img, cnt_pull, cnt_noteGroup, gddt, regdt 
+        FROM 
+            HM_GOODS 
+        WHERE 
+            deldt IS NULL AND gd_name LIKE ?
+        ORDER BY 
+            regdt DESC 
+        LIMIT ? OFFSET ?;
+    `;
+
+    connection.query(query, [`%${gd_name}%`, limit, offset], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+
+        // 각 상품에 대해 이미지 로드
+        const salesWithImages = results.map(sale => {
+            return new Promise((resolve, reject) => {
+                const imgQuery = `
+                    SELECT file_name, file_url
+                    FROM HM_IMG
+                    WHERE pidx = ? AND ttype = 'GOODS' AND deldt IS NULL;
+                `;
+
+                connection.query(imgQuery, [sale.gd_idx], (imgError, imgResults) => {
+                    if (imgError) {
+                        return reject(imgError);
+                    }
+                    sale.images = imgResults;
+                    resolve(sale);
+                });
+            });
+        });
+
+        // 모든 이미지 로드가 완료되면 콜백 호출
+        Promise.all(salesWithImages)
+            .then(results => callback(null, results))
+            .catch(error => callback(error, null));
+    });
+};
+
+const searchGoodsByMember = (mem_id, limit, offset, callback) => {
+    const query = `
+        SELECT 
+            gd_idx, cg_idx, ca_idx, brand_idx, brand_str, btype, mem_idx, mem_id, 
+            gd_name, gd_num, gd_status, gd_view, isware, buy_price, price, 
+            buy_place, buy_year, buy_month, condition_goods, condition_state, 
+            isbox, iswarranty, isetc, component, content, isoffer, isexchange, 
+            proposal, istemp, cnt_view, cnt_star, avg_star, cnt_good, cnt_bad, 
+            cnt_bookmark, cnt_comment, cnt_img, cnt_pull, cnt_noteGroup, gddt, regdt 
+        FROM 
+            HM_GOODS 
+        WHERE 
+            deldt IS NULL AND mem_id LIKE ?
+        ORDER BY 
+            regdt DESC 
+        LIMIT ? OFFSET ?;
+    `;
+
+    connection.query(query, [`%${mem_id}%`, limit, offset], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+
+        // 각 상품에 대해 이미지 로드
+        const salesWithImages = results.map(sale => {
+            return new Promise((resolve, reject) => {
+                const imgQuery = `
+                    SELECT file_name, file_url
+                    FROM HM_IMG
+                    WHERE pidx = ? AND ttype = 'GOODS' AND deldt IS NULL;
+                `;
+
+                connection.query(imgQuery, [sale.gd_idx], (imgError, imgResults) => {
+                    if (imgError) {
+                        return reject(imgError);
+                    }
+                    sale.images = imgResults;
+                    resolve(sale);
+                });
+            });
+        });
+
+        // 모든 이미지 로드가 완료되면 콜백 호출
+        Promise.all(salesWithImages)
+            .then(results => callback(null, results))
+            .catch(error => callback(error, null));
+    });
+};
+
+const getGoodsCountByMember = (mem_id, callback) => {
+    const query = `
+        SELECT 
+            COUNT(*) as totalItems 
+        FROM 
+            HM_GOODS 
+        WHERE 
+            deldt IS NULL AND mem_id LIKE ?;
+    `;
+
+    connection.query(query, [`%${mem_id}%`], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results[0].totalItems);
+    });
+};
+
+const getGoodsCountByName = (gd_name, callback) => {
+    const query = `
+        SELECT 
+            COUNT(*) as totalItems 
+        FROM 
+            HM_GOODS 
+        WHERE 
+            deldt IS NULL AND gd_name LIKE ?;
+    `;
+
+    connection.query(query, [`%${gd_name}%`], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results[0].totalItems);
+    });
+};
+
+
 module.exports = {
     getLimitedSalesList,
     getLimitedSalesCount,
@@ -193,4 +328,8 @@ module.exports = {
     getLimitedSalesCountByCategory,
     getBrandListByBtype,
     deleteLimitedSale,
+    getGoodsCountByName,
+    searchGoodsByName,
+    searchGoodsByMember,
+    getGoodsCountByMember,
 };
