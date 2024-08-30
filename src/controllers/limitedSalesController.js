@@ -179,7 +179,9 @@ const getGoodsDetail = (req, res) => {
             return res.status(500).json({ error: '상품 정보를 불러오는 중 오류가 발생했습니다.' });
         }
 
-        res.json(goods);
+        res.json({
+            data: goods,
+        });
     });
 };
 
