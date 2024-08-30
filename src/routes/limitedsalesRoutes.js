@@ -10,7 +10,7 @@ router.post('/limitedsales/post/delete/:gd_idx', limitedSalesController.deleteLi
 router.post('/limitedsales/post/search/goods/:gd_name/:page', limitedSalesController.searchGoodsByName);
 router.post('/limitedsales/post/search/member/:mem_id/:page', limitedSalesController.searchGoodsByMember);
 
-router.post('/limitedsales/post/detail/:gd_idx', limitedSalesController.getGoodsDetail);
+router.get('/limitedsales/post/detail/:gd_idx', limitedSalesController.getGoodsDetail);
 
 
 module.exports = router;
