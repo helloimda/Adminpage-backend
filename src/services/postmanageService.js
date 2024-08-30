@@ -807,9 +807,16 @@ const uploadImageToS3 = async (originalname, mimetype, buffer) => {
       params: uploadParams,
   });
 
-  const data = await upload.done();
-  return `https://${process.env.BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
+  try {
+      const data = await upload.done();
+      return `https://${process.env.BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
+  } catch (error) {
+      console.error('S3 이미지 업로드 실패:', error);
+      throw error;
+  }
 };
+
+
 
 const addNoticeImage = (bo_idx, file_name, mime_type, file_size, file_url, callback) => {
   // 먼저 bo_idx에 해당하는 이미지들의 최대 order_num 값을 조회합니다.
