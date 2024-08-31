@@ -1,7 +1,8 @@
 const userService = require('../services/userService');
 
 const getMembers = (req, res) => {
-    const page = parseInt(req.params.page) || 1;
+    try{
+      const page = parseInt(req.params.page) || 1;
     const limit = 10;
   
     userService.getMembersCount((error, totalMembers) => {
@@ -31,10 +32,15 @@ const getMembers = (req, res) => {
         });
       });
     });
+    }catch(error){
+      console.error('getMembers Controller error :', error.message);
+      res.status(500).send('getMembers Controller error');
+      }
   };
-
+  
   const searchMembersById = (req, res) => {
-    const searchTerm = req.params.name;
+    try{
+      const searchTerm = req.params.name;
     const page = parseInt(req.params.page) || 1;
     const limit = 10;
   
@@ -65,10 +71,15 @@ const getMembers = (req, res) => {
         });
       });
     });
+    }catch(error){
+      console.error('searchMembersById Controller error :', error.message);
+      res.status(500).send('searchMembersById Controller error');
+      }
   };
   
   const searchMembersByNick = (req, res) => {
-    const searchTerm = req.params.name;
+    try{
+      const searchTerm = req.params.name;
     const page = parseInt(req.params.page) || 1;
     const limit = 10;
   
@@ -99,10 +110,15 @@ const getMembers = (req, res) => {
         });
       });
     });
+    }catch(error){
+      console.error('searchMembersByNick Controller error :', error.message);
+      res.status(500).send('searchMembersByNick Controller error');
+      }
   };
 
   const banUser = (req, res) => {
-    const memIdx = req.params.mem_idx; // URL에서 mem_idx를 받음
+    try{
+      const memIdx = req.params.mem_idx; // URL에서 mem_idx를 받음
     const { stop_info, stopdt } = req.body; // 요청 본문에서 stop_info와 stopdt를 받음
   
     // 요청 본문을 로그로 출력하여 데이터 확인
@@ -125,13 +141,18 @@ const getMembers = (req, res) => {
       // 성공 시 응답
       res.json({ success: true, message: message });
     });
+    }catch(error){
+      console.error('banUser Controller error :', error.message);
+      res.status(500).send('banUser Controller error');
+      }
   };
   
   
 
 
   const deleteUser = (req, res) => {
-    const memIdx = req.params.mem_idx;  // URL 파라미터로 mem_idx를 받음
+    try{
+      const memIdx = req.params.mem_idx;  // URL 파라미터로 mem_idx를 받음
   
     if (!memIdx) {
         return res.status(400).json({  message: '삭제할 사용자 ID가 제공되지 않았습니다.' });
@@ -143,11 +164,16 @@ const getMembers = (req, res) => {
         }
         res.json({  message: message });
     });
+    }catch(error){
+      console.error('deleteUser Controller error :', error.message);
+      res.status(500).send('deleteUser Controller error');
+      }
   };
 
 
   const getUserDetail = (req, res) => {
-    const memIdx = req.params.mem_idx;  // 라우팅 경로에 맞게 mem_idx로 변경
+    try{
+      const memIdx = req.params.mem_idx;  // 라우팅 경로에 맞게 mem_idx로 변경
 
     userService.getUserDetailById(memIdx, (error, userDetail) => {
         if (error) {
@@ -156,6 +182,10 @@ const getMembers = (req, res) => {
         }
         res.json({ data: userDetail });
     });
+    }catch(error){
+      console.error('getUserDetail Controller error :', error.message);
+      res.status(500).send('getUserDetail Controller error');
+      }
 };
 
 module.exports = {

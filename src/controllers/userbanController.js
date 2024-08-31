@@ -1,7 +1,8 @@
 const userbanService = require('../services/userbanService');
 
 const banUser = (req, res) => {
-  const memIdx = req.params.mem_idx;
+  try{
+    const memIdx = req.params.mem_idx;
   const { stop_info, stopdt } = req.body;
 
   // req.body를 로그로 출력해 확인
@@ -20,12 +21,17 @@ const banUser = (req, res) => {
     }
     res.json({ success: true, message: message });
   });
+  }catch(error){
+    console.error('banUser Controller error :', error.message);
+    res.status(500).send('banUser Controller error');
+    }
 };
 
 
 
 const unbanUser = (req, res) => {
-  const memIdx = req.params.mem_idx;  // 단일 사용자 ID를 URL 파라미터로 받음
+  try{
+    const memIdx = req.params.mem_idx;  // 단일 사용자 ID를 URL 파라미터로 받음
 
   if (!memIdx) {
     return res.status(400).json({ success: false, message: '해제할 사용자 ID를 선택해주세요.' });
@@ -37,11 +43,16 @@ const unbanUser = (req, res) => {
     }
     res.json({ success: true, message: message });
   });
+  }catch(error){
+    console.error('unbanUser Controller error :', error.message);
+    res.status(500).send('unbanUser Controller error');
+    }
 };
 
 
 const getBannedUsers = (req, res) => {
-  const page = parseInt(req.params.page) || 1;
+  try{
+    const page = parseInt(req.params.page) || 1;
   const limit = 10;
 
   // 총 페이지 수 계산을 위한 전체 사용자 수 가져오기
@@ -71,12 +82,18 @@ const getBannedUsers = (req, res) => {
           });
       });
   });
+  }
+  catch(error){
+    console.error('getBannedUsersCount Controller error :', error.message);
+    res.status(500).send('getBannedUsersCount Controller error');
+    }
 };
 
 
 
 const searchBannedMembersById = (req, res) => {
-  const searchTerm = req.params.name;
+  try{
+    const searchTerm = req.params.name;
   const page = parseInt(req.params.page) || 1;
   const limit = 10;
 
@@ -106,10 +123,15 @@ const searchBannedMembersById = (req, res) => {
           });
       });
   });
+  }catch(error){
+    console.error('searchBannedMembersById Controller error :', error.message);
+    res.status(500).send('searchBannedMembersById Controller error');
+    }
 };
 
 const searchBannedMembersByNick = (req, res) => {
-  const searchTerm = req.params.name;
+  try{
+    const searchTerm = req.params.name;
   const page = parseInt(req.params.page) || 1;
   const limit = 10;
 
@@ -139,11 +161,16 @@ const searchBannedMembersByNick = (req, res) => {
           });
       });
   });
+  }catch(error){
+    console.error('searchBannedMembersByNick Controller error :', error.message);
+    res.status(500).send('searchBannedMembersByNick Controller error');
+    }
 };
 
 
 const deleteUser = (req, res) => {
-  const memIdx = req.params.mem_idx;  // URL 파라미터로 mem_idx를 받음
+  try{
+    const memIdx = req.params.mem_idx;  // URL 파라미터로 mem_idx를 받음
 
   if (!memIdx) {
       return res.status(400).json({  message: '삭제할 사용자 ID가 제공되지 않았습니다.' });
@@ -155,6 +182,10 @@ const deleteUser = (req, res) => {
       }
       res.json({  message: message });
   });
+  }catch(error){
+    console.error('deleteUser Controller error :', error.message);
+    res.status(500).send('deleteUser Controller error');
+    }
 };
 
 

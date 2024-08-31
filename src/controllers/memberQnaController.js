@@ -29,7 +29,7 @@ const getQnaPosts = (req, res) => {
                 res.json({ data: results, pagination: pagination });
             });
         });
-    }catch(err){
+    }catch(error){
         console.error('getQnaPosts Controller error :', error.message);
         res.status(500).send('getQnaPosts Controller error');
     }
@@ -48,7 +48,7 @@ const postQnaAnswer = (req, res) => {
 
             res.json({ message: '문의 답변이 성공적으로 등록되었습니다.' });
         });
-    }catch{
+    }catch(error){
         console.error('postQnaAnswer Controller error :', error.message);
         res.status(500).send('postQnaAnswer Controller error');
     }
@@ -80,7 +80,7 @@ const getNotRespondedQnaPosts = (req, res) => {
                 },
             });
         });
-    }catch(err){
+    }catch(error){
         console.error('getNotRespondedQnaPosts Controller error :', error.message);
         res.status(500).send('getNotRespondedQnaPosts Controller error');
     }
@@ -112,7 +112,7 @@ const getRespondedQnaPosts = (req, res) => {
                 },
             });
         });
-    }catch(err){
+    }catch(error){
         console.error('getRespondedQnaPosts Controller error :', error.message);
         res.status(500).send('getRespondedQnaPosts Controller error');
     }
@@ -139,7 +139,7 @@ const getQnaDetail = (req, res) => {
                 res.json(qnaDetail);
             });
         });
-    }catch{
+    }catch(error){
         console.error('getQnaDetail Controller error :', error.message);
         res.status(500).send('getQnaDetail Controller error');
     }

@@ -11,7 +11,7 @@ const getVisitors = (req, res) => {
       }
       res.json(results);
     });
-  }catch(err){
+  }catch(error){
     console.error('getVisitors Controller error :', error.message);
     res.status(500).send('getVisitors Controller error');
   }
@@ -29,7 +29,7 @@ const getRegistrations = (req, res) => {
       }
       res.json(count);
     });
-  } catch(err){
+  } catch(error){
     console.error('getRegistrations Controller error :', error.message);
     res.status(500).send('getRegistrations Controller error');
   }
@@ -45,7 +45,7 @@ const getTotalMembers = (req, res) => {
       }
       res.json(results);
     });
-  }catch(err){
+  }catch(error){
     console.error('getTotalMembers Controller error :', error.message);
     res.status(500).send('getTotalMembers Controller error');
   }
@@ -60,7 +60,7 @@ const getGenderAndAgeStats = (req, res) => {
       }
       res.json(stats);
     });
-  }catch(err){
+  }catch(error){
     console.error('getGenderAndAgeStats Controller error :', error.message);
     res.status(500).send('getGenderAndAgeStats Controller error');
   }
@@ -77,7 +77,7 @@ const getPostAnalysis = (req, res) => {
       }
       res.json(results);
     });
-  }catch(err){
+  }catch(error){
     console.error('getPostAnalysis Controller error :', error.message);
     res.status(500).send('getPostAnalysis Controller error');
   }
@@ -94,7 +94,7 @@ const getPostsByCategory = (req, res) => {
           }
           res.json(results);
       });
-  }catch(err){
+  }catch(error){
     console.error('getPostsByCategory Controller error :', error.message);
     res.status(500).send('getPostsByCategory Controller error');
   }
@@ -109,7 +109,7 @@ const getAllPostsByCategory = (req, res) => {
       }
       res.json(results);
   });
-  }catch(err){
+  }catch(error){
     console.error('getAllPostsByCategory Controller error :', error.message);
     res.status(500).send('getAllPostsByCategory Controller error');
   }

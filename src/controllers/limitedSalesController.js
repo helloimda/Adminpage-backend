@@ -111,7 +111,7 @@ const deleteLimitedSale = (req, res) => {
 
             res.json({ message: '게시글이 성공적으로 삭제되었습니다.' });
         });
-    }catch(err){
+    }catch(error){
         console.error('deleteLimitedSale Controller error :', error.message);
         res.status(500).send('deleteLimitedSale Controller error');
     }
@@ -152,7 +152,7 @@ const searchGoodsByName = (req, res) => {
                 });
             });
         });
-    }catch(err){
+    }catch(error){
         console.error('searchGoodsByName Controller error :', error.message);
         res.status(500).send('searchGoodsByName Controller error');
     }
@@ -193,7 +193,7 @@ const searchGoodsByMember = (req, res) => {
                 });
             });
         });
-    }catch(err){
+    }catch(error){
         console.error('searchGoodsByMember Controller error :', error.message);
         res.status(500).send('searchGoodsByMember Controller error');
     }
@@ -213,7 +213,7 @@ const getGoodsDetail = (req, res) => {
                 data: goods,
             });
         });
-    }catch(err){
+    }catch(error){
         console.error('getGoodsDetail Controller error :', error.message);
         res.status(500).send('getGoodsDetail Controller error');
     }
