@@ -142,10 +142,30 @@ const getGoodGoodsByGdIdx = (req, res) => {
     });
 };
 
+const getUserByMemIdx = (req, res) => {
+    const mem_idx = req.params.mem_idx;
+
+    goodsService.getUserByMemIdx(mem_idx, (error, user) => {
+        if (error) {
+            console.error('회원 정보 불러오기 실패:', error.message);
+            return res.status(500).send('회원 정보를 불러오는 중 오류가 발생했습니다.');
+        }
+
+        if (!user) {
+            return res.status(404).send('해당 회원을 찾을 수 없습니다.');
+        }
+
+        res.json({
+            mem_id: user.mem_id,
+            mem_nick: user.mem_nick,
+        });
+    });
+};
 
 module.exports = {
     getGoodsByBoIdx,
     getBadsByBoIdx,
     getGoodsCommentsByBoIdxCmtIdx,
     getGoodGoodsByGdIdx,
+    getUserByMemIdx,
 };

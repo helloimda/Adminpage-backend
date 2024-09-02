@@ -118,6 +118,23 @@ const getGoodGoodsCountByGdIdx = (gd_idx, callback) => {
     });
 };
 
+const getUserByMemIdx = (mem_idx, callback) => {
+    const query = `
+        SELECT mem_id, mem_nick
+        FROM HM_MEMBER
+        WHERE mem_idx = ?;
+    `;
+    connection.query(query, [mem_idx], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        if (results.length === 0) {
+            return callback(null, null); // 해당 mem_idx에 대한 데이터가 없음
+        }
+        callback(null, results[0]);
+    });
+};
+
 module.exports = {
     getGoodsByBoIdx,
     getGoodsCountByBoIdx,
@@ -127,4 +144,5 @@ module.exports = {
     getGoodsCommentsCountByBoIdxCmtIdx,
     getGoodGoodsByGdIdx,
     getGoodGoodsCountByGdIdx,
+    getUserByMemIdx
 };

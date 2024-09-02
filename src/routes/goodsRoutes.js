@@ -9,4 +9,6 @@ router.get('/goods/boardcomment/:bo_idx/:cmt_idx/:page', goodsController.getGood
 
 router.get('/goods/goodgoods/:gd_idx/:page', goodsController.getGoodGoodsByGdIdx);
 
+router.get('/goods/user/:mem_idx', goodsController.getUserByMemIdx);
+
 module.exports = router;
