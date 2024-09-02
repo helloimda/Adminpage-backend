@@ -107,8 +107,45 @@ const getGoodsCommentsByBoIdxCmtIdx = (req, res) => {
     });
 };
 
+const getGoodGoodsByGdIdx = (req, res) => {
+    const gd_idx = req.params.gd_idx;
+    const page = parseInt(req.params.page) || 1; // 요청된 페이지 번호, 기본값은 1
+    const limit = parseInt(req.query.limit) || 10; // 페이지당 항목 수, 기본값은 10
+    const offset = (page - 1) * limit;
+
+    goodsService.getGoodGoodsByGdIdx(gd_idx, limit, offset, (error, results) => {
+        if (error) {
+            console.error('좋아요 리스트 불러오기 실패:', error.message);
+            return res.status(500).send('좋아요 리스트를 불러오는 중 오류가 발생했습니다.');
+        }
+
+        goodsService.getGoodGoodsCountByGdIdx(gd_idx, (error, totalItems) => {
+            if (error) {
+                console.error('좋아요 수 조회 실패:', error.message);
+                return res.status(500).send('좋아요 수를 조회하는 중 오류가 발생했습니다.');
+            }
+
+            const totalPages = Math.ceil(totalItems / limit);
+            const previousPage = page > 1 ? page - 1 : null;
+            const nextPage = page < totalPages ? page + 1 : null;
+
+            res.json({
+                data: results,
+                pagination: {
+                    totalPages,
+                    previousPage,
+                    nextPage,
+                    currentPage: page,
+                },
+            });
+        });
+    });
+};
+
+
 module.exports = {
     getGoodsByBoIdx,
     getBadsByBoIdx,
     getGoodsCommentsByBoIdxCmtIdx,
+    getGoodGoodsByGdIdx,
 };

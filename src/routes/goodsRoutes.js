@@ -7,6 +7,6 @@ router.get('/goods/board/:bo_idx/:page', goodsController.getGoodsByBoIdx);
 router.get('/bads/board/:bo_idx/:page', goodsController.getBadsByBoIdx);
 router.get('/goods/boardcomment/:bo_idx/:cmt_idx/:page', goodsController.getGoodsCommentsByBoIdxCmtIdx);
 
-
+router.get('/goods/goodgoods/:gd_idx/:page', goodsController.getGoodGoodsByGdIdx);
 
 module.exports = router;

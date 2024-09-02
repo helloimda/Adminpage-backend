@@ -88,6 +88,36 @@ const getGoodsCommentsCountByBoIdxCmtIdx = (bo_idx, cmt_idx, callback) => {
     });
 };
 
+const getGoodGoodsByGdIdx = (gd_idx, limit, offset, callback) => {
+    const query = `
+        SELECT gdg_idx, mem_idx, gd_idx, regdt
+        FROM HM_MEMBER_GOODS_GOOD
+        WHERE gd_idx = ?
+        ORDER BY regdt DESC
+        LIMIT ? OFFSET ?;
+    `;
+    connection.query(query, [gd_idx, limit, offset], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results);
+    });
+};
+
+const getGoodGoodsCountByGdIdx = (gd_idx, callback) => {
+    const query = `
+        SELECT COUNT(*) as count
+        FROM HM_MEMBER_GOODS_GOOD
+        WHERE gd_idx = ?;
+    `;
+    connection.query(query, [gd_idx], (error, results) => {
+        if (error) {
+            return callback(error, null);
+        }
+        callback(null, results[0].count);
+    });
+};
+
 module.exports = {
     getGoodsByBoIdx,
     getGoodsCountByBoIdx,
@@ -95,4 +125,6 @@ module.exports = {
     getBadsCountByBoIdx,
     getGoodsCommentsByBoIdxCmtIdx,
     getGoodsCommentsCountByBoIdxCmtIdx,
+    getGoodGoodsByGdIdx,
+    getGoodGoodsCountByGdIdx,
 };
