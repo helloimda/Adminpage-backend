@@ -12,7 +12,7 @@ const postmanageRoutes = require('./routes/postmanageRoutes');
 const memberQnaRoutes = require('./routes/memberqna');
 const limitedSaleRoutes = require('./routes/limitedsalesRoutes');
 const reportManageRoutes = require('./routes/reportManageRoutes');
-
+const goodsRoutes = require('./routes/goodsRoutes');
 app.use(
   cors({
     origin: "*", // 또는 '*'
@@ -23,6 +23,7 @@ app.use(
 app.use(adminCheckMiddleware);
 
 app.use(express.json()); // JSON 요청 파싱
+app.use('/', goodsRoutes);
 app.use('/', reportManageRoutes);
 app.use('/', postmanageRoutes);
 app.use('/', userRoutes);
