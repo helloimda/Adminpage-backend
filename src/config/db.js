@@ -9,7 +9,7 @@ const connection = mysql.createPool({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     waitForConnections: true,
-    connectionLimit: 10,  // 최대 연결 수 설정
+    connectionLimit: 10,  // 최대 연결 수 설정 //ec2 배포할때 연결수 세팅하지않으면 하루단위로 팅김
     queueLimit: 0         // 대기열 제한 (0은 무제한)
 });
 
