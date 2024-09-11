@@ -33,7 +33,7 @@ router.get('/postmanage/general/search/subject/:id/:page', postmanageController.
 router.get('/postmanage/general/search/content/:id/:page', postmanageController.searchGeneralPostsByContent);
 router.get('/postmanage/general/search/nick/:id/:page', postmanageController.searchGeneralPostsByNick);
 router.get('/postmanage/general/comment/:id', postmanageController.getCommentsByPostId);
-router.get('/postmanage/general/comment/delete/:cmt_idx', postmanageController.deleteComment);
+router.post('/postmanage/general/comment/delete/:cmt_idx', postmanageController.deleteComment);
 router.get('/postmanage/general/comment/list/:page', postmanageController.getCommentList);
 router.get('/postmanage/general/comment/detail/:bo_idx/:page', postmanageController.getCommentDetailByPost);
 
@@ -47,7 +47,7 @@ router.post('/postmanage/fraud/delete/:id', postmanageController.deleteFraudPost
 router.get('/postmanage/fraud/search/nick/:id/:page', postmanageController.searchFraudPostsByMemId);
 router.get('/postmanage/fraud/search/goodname/:id/:page', postmanageController.searchFraudPostsByGoodName);
 router.get('/postmanage/fraud/comment/:bof_idx', postmanageController.getFraudCommentsByPostId);
-router.get('/postmanage/fraud/comment/delete/:bofc_idx', postmanageController.deleteFraudComment);
+router.post('/postmanage/fraud/comment/delete/:bofc_idx', postmanageController.deleteFraudComment);
 router.get('/postmanage/fraud/comment/list/:page', postmanageController.getFraudComments);
 router.get('/postmanage/fraud/comment/detail/:bof_idx/:page', postmanageController.getFraudCommentsByPost);
 
